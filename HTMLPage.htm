@@ -1,0 +1,2519 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thi Trắc Nghiệm — Kiến Trúc Máy Tính</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #1c2333;
+            --surface3: #21262d;
+            --border: #30363d;
+            --border2: #3d444d;
+            --text: #e6edf3;
+            --text2: #8b949e;
+            --text3: #6e7681;
+            --blue: #2f81f7;
+            --blue2: #1f6feb;
+            --blue-glow: rgba(47,129,247,0.15);
+            --green: #3fb950;
+            --green2: #238636;
+            --green-glow: rgba(63,185,80,0.15);
+            --red: #f85149;
+            --red2: #da3633;
+            --red-glow: rgba(248,81,73,0.15);
+            --yellow: #e3b341;
+            --yellow-glow: rgba(227,179,65,0.15);
+            --purple: #bc8cff;
+            --orange: #f0883e;
+            --radius: 12px;
+            --radius2: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Be Vietnam Pro',sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background: radial-gradient(ellipse 80% 50% at 50% -20%,rgba(47,129,247,0.08),transparent);
+                pointer-events: none;
+                z-index: 0
+            }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13,17,23,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px
+        }
+
+        .header-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.3px
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg,var(--blue),#6e40c9);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 8px
+        }
+
+        .hstat {
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            display: flex;
+            align-items: center;
+            gap: 5px
+        }
+
+            .hstat.active {
+                background: var(--blue-glow);
+                border-color: var(--blue);
+                color: var(--blue)
+            }
+
+        /* CONTAINER */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+            position: relative;
+            z-index: 1
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+            .card-header h2 {
+                font-size: 15px;
+                font-weight: 700
+            }
+
+        .card-body {
+            padding: 20px
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 2px;
+            background: var(--surface3);
+            border-radius: var(--radius);
+            padding: 4px;
+            margin-bottom: 20px
+        }
+
+        .tab {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: var(--radius2);
+            border: none;
+            background: transparent;
+            color: var(--text2);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center
+        }
+
+            .tab.active {
+                background: var(--blue);
+                color: #fff
+            }
+
+        /* SETUP */
+        #setupScreen {
+        }
+
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        @media(max-width:600px) {
+            .setup-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+            .field label {
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--text2);
+                text-transform: uppercase;
+                letter-spacing: .6px
+            }
+
+            .field select, .field input {
+                background: var(--surface3);
+                border: 1px solid var(--border);
+                border-radius: var(--radius2);
+                padding: 10px 12px;
+                color: var(--text);
+                font-family: inherit;
+                font-size: 14px;
+                outline: none;
+                transition: border .2s;
+                appearance: none;
+                -webkit-appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%238b949e'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center
+            }
+
+                .field select:focus, .field input:focus {
+                    border-color: var(--blue)
+                }
+
+            .field input {
+                background-image: none
+            }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 4px
+        }
+
+        .mode-card {
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            cursor: pointer;
+            transition: all .2s;
+            text-align: center
+        }
+
+            .mode-card:hover {
+                border-color: var(--border2);
+                background: var(--surface2)
+            }
+
+            .mode-card.selected {
+                border-color: var(--blue);
+                background: var(--blue-glow)
+            }
+
+            .mode-card .icon {
+                font-size: 24px;
+                margin-bottom: 6px
+            }
+
+            .mode-card .name {
+                font-size: 13px;
+                font-weight: 700
+            }
+
+            .mode-card .desc {
+                font-size: 11px;
+                color: var(--text2);
+                margin-top: 3px;
+                line-height: 1.4
+            }
+
+        .topic-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px
+        }
+
+        .topic-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--surface3);
+            color: var(--text2);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+            .topic-pill.selected {
+                background: var(--blue-glow);
+                border-color: var(--blue);
+                color: var(--blue)
+            }
+
+        .name-input-wrap {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+            .name-input-wrap input {
+                flex: 1
+            }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            text-decoration: none
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg,var(--blue),var(--blue2));
+            color: #fff
+        }
+
+            .btn-primary:hover {
+                filter: brightness(1.1);
+                transform: translateY(-1px)
+            }
+
+            .btn-primary:active {
+                transform: scale(.97)
+            }
+
+        .btn-secondary {
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            color: var(--text)
+        }
+
+            .btn-secondary:hover {
+                border-color: var(--border2)
+            }
+
+        .btn-danger {
+            background: var(--red-glow);
+            border: 1px solid var(--red);
+            color: var(--red)
+        }
+
+        .btn-full {
+            width: 100%
+        }
+
+        .btn-lg {
+            padding: 15px 24px;
+            font-size: 15px;
+            border-radius: var(--radius)
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+            border-radius: 6px
+        }
+
+        .info-banner {
+            background: var(--blue-glow);
+            border: 1px solid rgba(47,129,247,.3);
+            border-radius: var(--radius2);
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px
+        }
+
+        /* QUIZ SCREEN */
+        #quizScreen {
+            display: none
+        }
+
+        .quiz-topbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap
+        }
+
+        .qt-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 700
+        }
+
+            .qt-item.timer-block {
+                background: var(--surface2);
+                border-color: var(--border2)
+            }
+
+                .qt-item.timer-block.warn {
+                    background: var(--red-glow);
+                    border-color: var(--red);
+                    color: var(--red);
+                    animation: pulse .5s infinite alternate
+                }
+
+        @keyframes pulse {
+            from {
+                opacity: 1
+            }
+
+            to {
+                opacity: .6
+            }
+        }
+
+        .qt-timer-val {
+            font-family: 'JetBrains Mono',monospace;
+            font-size: 14px;
+            font-weight: 700;
+            min-width: 40px;
+            text-align: right
+        }
+
+        .qt-spacer {
+            flex: 1
+        }
+
+        .progress-track {
+            background: var(--surface3);
+            border-radius: 99px;
+            height: 6px;
+            margin-bottom: 20px;
+            overflow: hidden
+        }
+
+        .progress-fill {
+            height: 6px;
+            border-radius: 99px;
+            background: linear-gradient(90deg,var(--blue),var(--purple));
+            transition: width .4s cubic-bezier(.4,0,.2,1)
+        }
+
+        .q-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 12px
+        }
+
+        .q-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--blue-glow);
+            border: 1px solid rgba(47,129,247,.3);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--blue);
+            margin-bottom: 12px
+        }
+
+        .q-text {
+            font-size: 16px;
+            line-height: 1.65;
+            font-weight: 500;
+            color: var(--text)
+        }
+
+        .q-code {
+            font-family: 'JetBrains Mono',monospace;
+            background: var(--surface3);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 13px;
+            margin-top: 8px;
+            white-space: pre-wrap;
+            color: #79c0ff
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 16px
+        }
+
+        .opt {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all .18s;
+            background: var(--surface2);
+            user-select: none
+        }
+
+            .opt:hover {
+                border-color: var(--border2);
+                background: var(--surface3);
+                transform: translateX(2px)
+            }
+
+            .opt.selected {
+                border-color: var(--blue);
+                background: var(--blue-glow)
+            }
+
+            .opt.correct {
+                border-color: var(--green);
+                background: var(--green-glow)
+            }
+
+            .opt.wrong {
+                border-color: var(--red);
+                background: var(--red-glow)
+            }
+
+            .opt.show-correct {
+                border-color: var(--green);
+                background: var(--green-glow)
+            }
+
+            .opt.skipped {
+                border-color: var(--border);
+                opacity: .5
+            }
+
+        .opt-letter {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 8px;
+            background: var(--surface3);
+            border: 1.5px solid var(--border2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text2);
+            font-family: 'JetBrains Mono',monospace;
+            transition: all .18s
+        }
+
+        .opt.selected .opt-letter {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff
+        }
+
+        .opt.correct .opt-letter {
+            background: var(--green2);
+            border-color: var(--green);
+            color: #fff
+        }
+
+        .opt.wrong .opt-letter {
+            background: var(--red2);
+            border-color: var(--red);
+            color: #fff
+        }
+
+        .opt.show-correct .opt-letter {
+            background: var(--green2);
+            border-color: var(--green);
+            color: #fff
+        }
+
+        .opt-text {
+            font-size: 14px;
+            line-height: 1.55;
+            color: var(--text);
+            padding-top: 2px
+        }
+
+        .feedback-bar {
+            padding: 10px 14px;
+            border-radius: var(--radius2);
+            font-size: 13px;
+            font-weight: 600;
+            display: none;
+            margin-top: 8px;
+            border: 1px solid
+        }
+
+            .feedback-bar.show {
+                display: block;
+                animation: slidein .2s ease
+            }
+
+            .feedback-bar.ok {
+                background: var(--green-glow);
+                border-color: rgba(63,185,80,.4);
+                color: var(--green)
+            }
+
+            .feedback-bar.no {
+                background: var(--red-glow);
+                border-color: rgba(248,81,73,.4);
+                color: var(--red)
+            }
+
+            .feedback-bar.skip {
+                background: var(--yellow-glow);
+                border-color: rgba(227,179,65,.4);
+                color: var(--yellow)
+            }
+
+        @keyframes slidein {
+            from {
+                opacity: 0;
+                transform: translateY(-4px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .quiz-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 4px
+        }
+
+        /* Q NAV (azota style) */
+        .q-nav-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 12px
+        }
+
+        .q-nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .q-nav-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px
+        }
+
+        .qn-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1.5px solid var(--border);
+            background: var(--surface3);
+            color: var(--text2);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'JetBrains Mono',monospace
+        }
+
+            .qn-btn:hover {
+                border-color: var(--blue);
+                color: var(--blue)
+            }
+
+            .qn-btn.current {
+                border-color: var(--blue);
+                background: var(--blue);
+                color: #fff
+            }
+
+            .qn-btn.answered-correct {
+                border-color: var(--green);
+                background: var(--green-glow);
+                color: var(--green)
+            }
+
+            .qn-btn.answered-wrong {
+                border-color: var(--red);
+                background: var(--red-glow);
+                color: var(--red)
+            }
+
+            .qn-btn.skipped {
+                border-color: var(--yellow);
+                background: var(--yellow-glow);
+                color: var(--yellow)
+            }
+
+        .qn-legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px
+        }
+
+        .qn-leg {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: var(--text2)
+        }
+
+        .qn-leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px
+        }
+
+        /* RESULT */
+        #resultScreen {
+            display: none
+        }
+
+        .result-hero {
+            text-align: center;
+            padding: 32px 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg,var(--surface) 0%,var(--surface2) 100%)
+        }
+
+        .result-emoji {
+            font-size: 56px;
+            margin-bottom: 8px;
+            display: block;
+            animation: bounce .5s ease
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: scale(.5);
+                opacity: 0
+            }
+
+            70% {
+                transform: scale(1.1)
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px
+        }
+
+        .result-score-big {
+            font-size: 52px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono',monospace;
+            background: linear-gradient(135deg,var(--blue),var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 8px 0
+        }
+
+        .result-sub {
+            color: var(--text2);
+            font-size: 14px
+        }
+
+        .grade-tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-top: 10px;
+            letter-spacing: .3px
+        }
+
+        .result-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 10px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        @media(max-width:500px) {
+            .result-stats-grid {
+                grid-template-columns: repeat(2,1fr)
+            }
+        }
+
+        .rstat {
+            text-align: center;
+            padding: 12px 8px;
+            border-radius: var(--radius2);
+            background: var(--surface3)
+        }
+
+        .rstat-val {
+            font-size: 24px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono',monospace
+        }
+
+            .rstat-val.c {
+                color: var(--green)
+            }
+
+            .rstat-val.w {
+                color: var(--red)
+            }
+
+            .rstat-val.t {
+                color: var(--blue)
+            }
+
+            .rstat-val.p {
+                color: var(--purple)
+            }
+
+        .rstat-lbl {
+            font-size: 11px;
+            color: var(--text2);
+            margin-top: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px
+        }
+
+        .topic-breakdown {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .tb-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 12px
+        }
+
+        .tb-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 13px
+        }
+
+        .tb-label {
+            width: 140px;
+            color: var(--text2);
+            font-size: 12px;
+            flex-shrink: 0
+        }
+
+        .tb-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: var(--surface3);
+            border-radius: 99px;
+            overflow: hidden
+        }
+
+        .tb-bar-fill {
+            height: 10px;
+            border-radius: 99px;
+            background: linear-gradient(90deg,var(--blue),var(--green));
+            transition: width 1s cubic-bezier(.4,0,.2,1)
+        }
+
+        .tb-pct {
+            width: 36px;
+            text-align: right;
+            font-family: 'JetBrains Mono',monospace;
+            font-size: 12px;
+            font-weight: 700
+        }
+
+        .result-actions {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        /* LEADERBOARD */
+        #lbScreen {
+            display: none
+        }
+
+        .lb-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 0 20px 20px
+        }
+
+        .lb-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius2);
+            background: var(--surface3);
+            border: 1px solid var(--border)
+        }
+
+            .lb-row.me {
+                border-color: var(--blue);
+                background: var(--blue-glow)
+            }
+
+        .lb-rank {
+            width: 28px;
+            font-family: 'JetBrains Mono',monospace;
+            font-weight: 800;
+            font-size: 14px;
+            text-align: center;
+            color: var(--text2)
+        }
+
+            .lb-rank.gold {
+                color: #f1c40f
+            }
+
+            .lb-rank.silver {
+                color: #bdc3c7
+            }
+
+            .lb-rank.bronze {
+                color: #cd6133
+            }
+
+        .lb-name {
+            flex: 1;
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .lb-score {
+            font-family: 'JetBrains Mono',monospace;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--blue)
+        }
+
+        .lb-time {
+            font-size: 11px;
+            color: var(--text2)
+        }
+
+        .lb-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text3);
+            font-size: 14px
+        }
+
+        /* REVIEW */
+        #reviewScreen {
+            display: none
+        }
+
+        .rev-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 10px
+        }
+
+        .rev-status-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+            .rev-status-tag.ok {
+                background: var(--green-glow);
+                color: var(--green);
+                border: 1px solid rgba(63,185,80,.3)
+            }
+
+            .rev-status-tag.no {
+                background: var(--red-glow);
+                color: var(--red);
+                border: 1px solid rgba(248,81,73,.3)
+            }
+
+            .rev-status-tag.skip {
+                background: var(--yellow-glow);
+                color: var(--yellow);
+                border: 1px solid rgba(227,179,65,.3)
+            }
+
+        .rev-q-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 10px;
+            line-height: 1.55
+        }
+
+        .rev-opt {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 4px
+        }
+
+            .rev-opt.correct-ans {
+                background: var(--green-glow);
+                color: var(--green);
+                border: 1px solid rgba(63,185,80,.3)
+            }
+
+            .rev-opt.user-wrong {
+                background: var(--red-glow);
+                color: var(--red);
+                border: 1px solid rgba(248,81,73,.3)
+            }
+
+            .rev-opt.neutral {
+                background: var(--surface3);
+                color: var(--text2);
+                border: 1px solid var(--border)
+            }
+
+        .rev-num {
+            font-size: 11px;
+            color: var(--text2);
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        /* MODAL (time warning, submit confirm) */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            display: none
+        }
+
+            .modal-overlay.show {
+                display: flex
+            }
+
+        .modal-box {
+            background: var(--surface);
+            border: 1px solid var(--border2);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            animation: modalin .2s ease
+        }
+
+        @keyframes modalin {
+            from {
+                transform: scale(.9);
+                opacity: 0
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1
+            }
+        }
+
+        .modal-box h3 {
+            font-size: 17px;
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        .modal-box p {
+            color: var(--text2);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 8px
+        }
+
+        /* TIMER RING */
+        .timer-ring-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .timer-ring {
+            transform: rotate(-90deg)
+        }
+
+        .timer-ring-bg {
+            fill: none;
+            stroke: var(--surface3);
+            stroke-width: 3
+        }
+
+        .timer-ring-fill {
+            fill: none;
+            stroke: var(--blue);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset .9s linear,stroke .5s
+        }
+
+        .timer-ring-text {
+            position: absolute;
+            font-family: 'JetBrains Mono',monospace;
+            font-weight: 800;
+            font-size: 11px
+        }
+
+        /* TOTAL TIMER (azota style – countdown for whole exam) */
+        .total-timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface2);
+            border: 1px solid var(--border2);
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-family: 'JetBrains Mono',monospace;
+            font-size: 13px;
+            font-weight: 700
+        }
+
+            .total-timer.warn {
+                border-color: var(--yellow);
+                color: var(--yellow);
+                background: var(--yellow-glow)
+            }
+
+            .total-timer.danger {
+                border-color: var(--red);
+                color: var(--red);
+                background: var(--red-glow);
+                animation: pulse .4s infinite alternate
+            }
+
+        /* ANSWERED COUNTER */
+        .answered-counter {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            font-size: 12px
+        }
+
+        .ac-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 700
+        }
+
+        .ac-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%
+        }
+
+        /* DIFFICULTY STARS */
+        .diff-stars {
+            display: flex;
+            gap: 2px
+        }
+
+        .diff-star {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border)
+        }
+
+            .diff-star.fill {
+                background: var(--yellow)
+            }
+
+        /* Profile input */
+        .profile-section {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            background: var(--surface2)
+        }
+
+        .profile-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text2);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 10px
+        }
+
+        .section-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 16px 0
+        }
+
+        /* MISC */
+        .text-muted {
+            color: var(--text2)
+        }
+
+        .text-sm {
+            font-size: 13px
+        }
+
+        .mt-8 {
+            margin-top: 8px
+        }
+
+        .mt-12 {
+            margin-top: 12px
+        }
+
+        .mt-16 {
+            margin-top: 16px
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .gap-8 {
+            gap: 8px
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-between {
+            justify-content: space-between
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono',monospace
+        }
+
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .3s;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+            .scroll-top-btn.visible {
+                opacity: 1
+            }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">🖥</div>
+                Kiến Trúc Máy Tính
+            </div>
+            <div class="header-stats" id="headerStats">
+                <div class="hstat" id="hstatTotal">📚 Đang tải...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- SETUP -->
+        <div id="setupScreen">
+            <div class="tabs" id="setupTabs">
+                <button class="tab active" onclick="switchSetupTab('exam')">🎯 Thi</button>
+                <button class="tab" onclick="switchSetupTab('practice')">📖 Luyện tập</button>
+                <button class="tab" onclick="switchSetupTab('leaderboard')">🏆 Bảng xếp hạng</button>
+            </div>
+
+            <!-- EXAM TAB -->
+            <div id="tabExam">
+                <div class="card mt-12">
+                    <div class="card-header"><span style="font-size:18px">👤</span><h2>Thông tin học sinh</h2></div>
+                    <div class="card-body">
+                        <div class="setup-grid">
+                            <div class="field">
+                                <label>Họ và tên</label>
+                                <input id="studentName" type="text" placeholder="Nhập tên của bạn..." value="">
+                            </div>
+                            <div class="field">
+                                <label>Mã sinh viên</label>
+                                <input id="studentId" type="text" placeholder="Ví dụ: 21520xxx">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-12">
+                    <div class="card-header"><span style="font-size:18px">⚙️</span><h2>Cài đặt bài thi</h2></div>
+                    <div class="card-body">
+                        <div class="setup-grid">
+                            <div class="field">
+                                <label>Số câu hỏi</label>
+                                <select id="numQ">
+                                    <option value="10">10 câu</option>
+                                    <option value="20" selected>20 câu</option>
+                                    <option value="30">30 câu</option>
+                                    <option value="40">40 câu</option>
+                                    <option value="50">50 câu</option>
+                                    <option value="0">Tất cả câu hỏi</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Thời gian làm bài</label>
+                                <select id="totalTime">
+                                    <option value="0">Không giới hạn</option>
+                                    <option value="600">10 phút</option>
+                                    <option value="900">15 phút</option>
+                                    <option value="1200" selected>20 phút</option>
+                                    <option value="1800">30 phút</option>
+                                    <option value="2700">45 phút</option>
+                                    <option value="3600">60 phút</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Chủ đề</label>
+                                <select id="topicSel">
+                                    <option value="all">Tất cả</option>
+                                    <option value="arch">Kiến trúc & Von Neumann</option>
+                                    <option value="cpu">CPU & Thanh ghi</option>
+                                    <option value="mem">Bộ nhớ RAM/ROM/Cache</option>
+                                    <option value="asm">Hợp ngữ Assembly</option>
+                                    <option value="interrupt">Ngắt & Pipeline</option>
+                                    <option value="bus">Bus & I/O</option>
+                                    <option value="storage">Bộ nhớ ngoài & RAID</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label>Thứ tự câu hỏi</label>
+                                <select id="orderMode">
+                                    <option value="random">Ngẫu nhiên</option>
+                                    <option value="original">Theo thứ tự</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="section-divider"></div>
+                        <div class="field">
+                            <label>Chế độ thi</label>
+                            <div class="mode-grid mt-8" id="modeGrid">
+                                <div class="mode-card selected" data-mode="exam" onclick="selectMode(this)">
+                                    <div class="icon">📝</div>
+                                    <div class="name">Thi thật</div>
+                                    <div class="desc">Ẩn đáp án, nộp khi hết giờ</div>
+                                </div>
+                                <div class="mode-card" data-mode="practice" onclick="selectMode(this)">
+                                    <div class="icon">📚</div>
+                                    <div class="name">Luyện tập</div>
+                                    <div class="desc">Hiện đáp án ngay sau mỗi câu</div>
+                                </div>
+                                <div class="mode-card" data-mode="review" onclick="selectMode(this)">
+                                    <div class="icon">🔍</div>
+                                    <div class="name">Ôn tập</div>
+                                    <div class="desc">Làm tất cả, không bấm giờ</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bankInfo" class="info-banner mt-12">
+                    <span>📊</span><span id="bankInfoText">Đang tải...</span>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-8" onclick="startQuiz()">
+                    🚀 Bắt đầu thi
+                </button>
+            </div>
+
+            <!-- PRACTICE TAB -->
+            <div id="tabPractice" style="display:none">
+                <div class="card mt-12">
+                    <div class="card-header"><span style="font-size:18px">🎯</span><h2>Luyện theo chủ đề</h2></div>
+                    <div class="card-body">
+                        <div id="topicCards" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEADERBOARD TAB -->
+            <div id="tabLeaderboard" style="display:none">
+                <div class="card mt-12">
+                    <div class="card-header">
+                        <span style="font-size:18px">🏆</span>
+                        <h2>Bảng xếp hạng</h2>
+                        <div style="flex:1"></div>
+                        <button class="btn btn-sm btn-danger" onclick="clearLeaderboard()">🗑 Xóa</button>
+                    </div>
+                    <div id="lbContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ -->
+        <div id="quizScreen">
+            <!-- Top bar -->
+            <div class="quiz-topbar" id="quizTopbar">
+                <div class="qt-item">📖 <span id="qCurrent">1</span>/<span id="qTotal">20</span></div>
+                <div class="qt-item" id="answeredIndicator">✅ <span id="answeredCount">0</span> đúng</div>
+                <div class="qt-item" id="skippedIndicator">⚡ <span id="skippedCount">0</span> bỏ qua</div>
+                <div class="qt-spacer"></div>
+                <div class="total-timer" id="totalTimerBlock" style="display:none">
+                    ⏱ <span id="totalTimerVal">00:00</span>
+                </div>
+                <button class="btn btn-sm btn-danger" id="btnSubmitEarly" onclick="confirmSubmit()" style="display:none">Nộp bài</button>
+            </div>
+
+            <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+            <!-- Q Navigation grid -->
+            <div class="q-nav-wrap" id="qNavWrap">
+                <div class="q-nav-title">
+                    Danh sách câu hỏi
+                    <div class="qn-legend">
+                        <div class="qn-leg"><div class="qn-leg-dot" style="background:var(--blue)"></div> Đang xem</div>
+                        <div class="qn-leg"><div class="qn-leg-dot" style="background:var(--green)"></div> Đúng</div>
+                        <div class="qn-leg"><div class="qn-leg-dot" style="background:var(--red)"></div> Sai</div>
+                        <div class="qn-leg"><div class="qn-leg-dot" style="background:var(--yellow)"></div> Bỏ qua</div>
+                    </div>
+                </div>
+                <div class="q-nav-grid" id="qNavGrid"></div>
+            </div>
+
+            <!-- Question -->
+            <div class="q-card" id="qCard">
+                <div class="q-badge" id="qBadge">Câu 1 — Kiến trúc</div>
+                <div class="q-text" id="qText"></div>
+                <div class="options" id="optionsWrap"></div>
+                <div class="feedback-bar" id="feedbackBar"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="quiz-actions">
+                <button class="btn btn-secondary" id="btnSkip" onclick="skipQ()" style="flex:1">⏭ Bỏ qua</button>
+                <button class="btn btn-primary" id="btnNext" onclick="nextQ()" style="flex:2;display:none">Câu tiếp theo →</button>
+            </div>
+        </div>
+
+        <!-- RESULT -->
+        <div id="resultScreen">
+            <div class="card">
+                <div class="result-hero">
+                    <span class="result-emoji" id="resultEmoji"></span>
+                    <div class="result-title" id="resultTitle"></div>
+                    <div class="result-score-big" id="resultScoreBig"></div>
+                    <div class="result-sub" id="resultSub"></div>
+                    <span class="grade-tag" id="gradeTag"></span>
+                    <div style="margin-top:12px;font-size:12px;color:var(--text2)" id="studentInfo"></div>
+                </div>
+
+                <div class="result-stats-grid">
+                    <div class="rstat"><div class="rstat-val c" id="rCorrect">0</div><div class="rstat-lbl">Câu đúng</div></div>
+                    <div class="rstat"><div class="rstat-val w" id="rWrong">0</div><div class="rstat-lbl">Câu sai</div></div>
+                    <div class="rstat"><div class="rstat-val t" id="rSkipped">0</div><div class="rstat-lbl">Bỏ qua</div></div>
+                    <div class="rstat"><div class="rstat-val p" id="rTime">0:00</div><div class="rstat-lbl">Thời gian</div></div>
+                </div>
+
+                <div class="topic-breakdown" id="topicBreakdown"></div>
+
+                <div class="result-actions">
+                    <button class="btn btn-primary btn-full" onclick="retryQuiz()">🔄 Thi lại</button>
+                    <button class="btn btn-secondary btn-full" onclick="showReview()">📋 Xem đáp án chi tiết</button>
+                    <button class="btn btn-secondary btn-full" onclick="backToSetup()">🏠 Về trang chủ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVIEW -->
+        <div id="reviewScreen" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <div style="font-size:15px;font-weight:800">📋 Chi tiết đáp án</div>
+                <button class="btn btn-sm btn-secondary" onclick="backToResult()">← Quay lại</button>
+            </div>
+            <div id="reviewFilter" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+                <button class="btn btn-sm btn-primary" onclick="filterReview('all')" id="rfAll">Tất cả</button>
+                <button class="btn btn-sm btn-secondary" onclick="filterReview('wrong')" id="rfWrong">❌ Câu sai</button>
+                <button class="btn btn-sm btn-secondary" onclick="filterReview('correct')" id="rfCorrect">✅ Câu đúng</button>
+                <button class="btn btn-sm btn-secondary" onclick="filterReview('skipped')" id="rfSkipped">⚡ Bỏ qua</button>
+            </div>
+            <div id="reviewContent"></div>
+            <button class="btn btn-secondary btn-full" onclick="backToResult()" style="margin-top:12px">← Quay lại kết quả</button>
+        </div>
+
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal-box">
+            <h3>📤 Xác nhận nộp bài</h3>
+            <p id="submitModalText">Bạn còn <strong id="unansweredLeft">0</strong> câu chưa trả lời. Bạn có chắc muốn nộp bài không?</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" style="flex:1" onclick="doSubmit()">✅ Nộp bài</button>
+                <button class="btn btn-secondary" style="flex:1" onclick="closeModal()">← Tiếp tục làm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timeupModal">
+        <div class="modal-box">
+            <h3>⏰ Hết giờ!</h3>
+            <p>Thời gian làm bài đã kết thúc. Kết quả của bạn sẽ được tính trên những câu đã trả lời.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" style="flex:1" onclick="doSubmit()">📊 Xem kết quả</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+    <script>
+        const TOPIC_NAMES = {
+        arch: 'Kiến trúc & Von Neumann',
+        cpu: 'CPU & Thanh ghi',
+        mem: 'Bộ nhớ RAM/ROM/Cache',
+        asm: 'Hợp ngữ Assembly',
+        interrupt: 'Ngắt & Pipeline',
+        bus: 'Bus & I/O',
+        storage: 'Bộ nhớ ngoài & RAID'
+        };
+        const TOPIC_ICONS = {arch:'🏛',cpu:'⚙️',mem:'💾',asm:'📝',interrupt:'⚡',bus:'🔌',storage:'🗄'};
+        const LETTERS = ['A','B','C','D'];
+
+       const ALL_QUESTIONS = [
+// ==================== KIẾN TRÚC MÁY TÍNH & VON NEUMANN ====================
+{t:'arch',q:'Trình tự xử lý thông tin của máy tính là',opts:['CPU → Đĩa cứng → Màn hình','Nhận thông tin → Xử lý thông tin → Xuất thông tin','CPU → Màn hình → Máy in','Bàn phím → CPU → Màn hình'],a:1},
+{t:'arch',q:'Các chức năng cơ bản của máy tính',opts:['Lưu trữ dữ liệu, Chạy chương trình, Nối ghép với thiết bị ngoại vi, Truy nhập bộ nhớ','Trao đổi dữ liệu, Điều khiển, Thực hiện lệnh, Xử lý dữ liệu','Lưu trữ dữ liệu, Xử lý dữ liệu, Trao đổi dữ liệu, Điều khiển','Điều khiển, Lưu trữ dữ liệu, Thực hiện phép toán, Kết nối Internet'],a:2},
+{t:'arch',q:'Các thành phần cơ bản của máy tính',opts:['RAM, CPU, ổ đĩa cứng, Bus liên kết','Hệ thống nhớ, Bus liên kết, ROM, Bàn phím','Hệ thống nhớ, Bộ xử lý, Màn hình, Chuột','Hệ thống nhớ, Bộ xử lý, Hệ thống vào ra, Bus liên kết'],a:3},
+{t:'arch',q:'Hệ thống vào/ra của máy tính không bao gồm đồng thời các thiết bị sau',opts:['Đĩa từ, Loa, Đĩa CD-ROM','Màn hình, RAM, Máy in','CPU, Chuột, Máy Scan','ROM, RAM, Các thanh ghi'],a:3},
+{t:'arch',q:'Máy tính ENIAC là máy tính',opts:['Do Bộ giáo dục Mỹ đặt hàng','Là máy tính ra đời vào những năm 1970','Dùng vi mạch cỡ nhỏ và cỡ vừa','Là máy tính điện tử đầu tiên trên thế giới'],a:3},
+{t:'arch',q:'Một trong các đặc điểm của máy tính John Von Newmann là',opts:['Máy tính có thể hoạt động theo một chương trình đã được lưu trữ','Máy tính có thể điều khiển mọi hoạt động bằng một chương trình duy nhất','Bộ nhớ máy tính không thể địa chỉ hóa được','Mỗi câu lệnh phải có một vùng nhớ chứa địa chỉ lệnh tiếp theo'],a:0},
+{t:'arch',q:'Hai dạng thông tin cơ bản mà bộ nhớ chính (RAM) nạp vào là gì?',opts:['Chỉ thị và dữ liệu của chương trình','Chỉ thị và các giá trị số học của chương trình','Các giá trị thập phân, nhị phân, hexa','Các văn bản và hình ảnh'],a:0},
+{t:'arch',q:'Kiến trúc của máy tính là đề cập đến những điều gì?',opts:['Các thuộc tính logic và cách xây dựng các thuộc tính logic dựa trên tổ chức vật lý','Hình dáng bên ngoài của máy tính bao gồm các thiết bị ngoại vi','Chi tiết các cấu kiện mạch điện tử và nguyên lý hoạt động xử lý','Chi tiết các thành phần phần mềm thực hiện các khả năng computing'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây đúng về kiến trúc Harvard?',opts:['Chỉ thị và dữ liệu không dùng chung bus','Data bus là chung cho cả chỉ thị và dữ liệu','Không có thành phần I/O','Chỉ có thành phần bộ nhớ thứ cấp'],a:0},
+{t:'arch',q:'Đâu là đặc trưng của kiến trúc John Von Neumann',opts:['Chỉ thị và dữ liệu dùng chung bộ nhớ','Có bốn thành phần chính là CPU, I/O, BUS, Memory','Dùng stored-program','Dùng general-purpose hardware'],a:0},
+{t:'arch',q:'Thông tin được lưu trữ và truyền bên trong máy tính dưới dạng',opts:['Mã ASCII','Thập phân','Nhị phân','Kết hợp chữ cái và chữ số'],a:2},
+{t:'arch',q:'Phát biểu nào sau đây là sai về máy tính theo mô hình Harvard?',opts:['Máy tính theo mô hình Harvard không sử dụng khái niệm stored program','Máy tính theo mô hình Harvard có bộ nhớ chương trình và bộ nhớ dữ liệu tách biệt','Máy tính theo mô hình Harvard có thể thực hiện truyền dữ liệu','Máy tính theo mô hình Harvard không có tính năng self modifying code'],a:0},
+{t:'arch',q:'Big endian và little endian là đề cập đến điều gì?',opts:['Thứ tự địa chỉ lưu trữ các byte của một từ nhớ gồm nhiều byte','Quan hệ giữa các byte trong từ nhớ gồm nhiều byte','Qui tắc đánh địa chỉ trong bộ nhớ chính','Giá trị lớn hay nhỏ của địa chỉ lưu trữ dữ liệu'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây là đúng cho trường hợp Little Endian?',opts:['Địa chỉ cao chứa byte có trọng số cao','Địa chỉ cao chứa byte có trọng số thấp','Địa chỉ cao chứa chỉ thị đứng sau','Địa chỉ cao chứa chỉ thị đứng trước'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây là đúng cho trường hợp Big Endian?',opts:['Địa chỉ cao chứa byte có trọng số thấp','Địa chỉ cao chứa dữ liệu lớn','Địa chỉ cao chứa chỉ thị đứng sau','Địa chỉ cao chứa chỉ thị đứng trước'],a:0},
+{t:'arch',q:'Máy tính GPC (general purpose computer) là như thế nào?',opts:['Máy tính có thể thay đổi chức năng tùy vào chương trình','Máy tính được thiết kế để chạy các ứng dụng phổ biến','Máy tính chỉ để cho cá nhân sử dụng','Máy tính chuyên xử lý dữ liệu'],a:0},
+{t:'arch',q:'Chỉ thị của máy tính IAS của John Von Newmann có bao nhiêu bit?',opts:['20 bit','40 bit','16 bit','32 bit'],a:0},
+{t:'arch',q:'Số lượng chỉ thị có thể trên máy tính của John Von Neumann là bao nhiêu?',opts:['256','64','21','128'],a:0},
+{t:'arch',q:'Số thanh ghi trong máy tính của John Von Neumann là bao nhiêu?',opts:['7','8','5','6'],a:0},
+{t:'arch',q:'Máy tính John Von Newmann là máy tính',opts:['Chỉ có 01 bộ xử lý, thực hiện các lệnh tuần tự','Có thể thực hiện nhiều lệnh cùng một lúc (song song)','Thực hiện theo chương trình nằm sẵn bên trong bộ nhớ','Cả A và C'],a:3},
+{t:'arch',q:'Trong mô hình máy tính John Von Neumann mỗi lần nạp chỉ thị từ bộ nhớ, chỉ thị bên phải được đặt vào đâu?',opts:['IBR','IR','MAR','PC'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây đúng?',opts:['Máy tính được thiết kế theo kiến trúc Harvard vì mục đích chạy nhanh','Máy tính được thiết kế theo kiến trúc John Von Neumann vì mục đích chạy nhanh','Máy tính được thiết kế theo kiến trúc Harvard vì mục đích giảm giá thành','Máy tính được thiết kế theo kiến trúc John Von Neumann vì mục đích giảm giá thành'],a:0},
+{t:'arch',q:'Thanh ghi nào sau đây có chức năng chứa operation code của chỉ thị trong máy tính John Von Neumann?',opts:['IR','MAR','MBR','MQ'],a:0},
+{t:'arch',q:'Thanh ghi nào sau đây có chức năng lưu tạm chỉ thị trong máy tính của John Von Neumann?',opts:['IBR','IR','MBR','AC'],a:0},
+{t:'arch',q:'Các ký hiệu sau đây là các thanh ghi trong máy tính IAS',opts:['IBR, MAR, MBR, AC, PC','AC, MBR, BCR, IQ, VBR','AC, MBR, IR, MQR, MAR','MAR, MBR, CQR, AX, EAX'],a:0},
+{t:'arch',q:'Với máy tính theo kiến trúc John Von Neumann, trong quá trình nạp chương trình từ bộ nhớ, thanh ghi MBR sẽ chứa gì bên trong?',opts:['Chỉ thị ở dạng mã máy','Mã lệnh của chỉ thị','Địa chỉ của chỉ thị','Mã nhị phân của chỉ thị ở dạng hợp ngữ'],a:0},
+{t:'arch',q:'Khái niệm computing là bao gồm những gì?',opts:['Xử lý tính toán, điều khiển, lưu trữ và truyền tin','Điều khiển, xử lý tính toán, truyền thông tin và lập trình','Lưu trữ, điều khiển, xử lý tính toán và thiết kế','Điều khiển, lưu trữ, xử lý tính toán và quản lý'],a:0},
+{t:'arch',q:'Khái niệm stored-program không đề cập đến điều gì?',opts:['Chu kỳ chỉ thị','Xử lý tuần tự chỉ thị','Đặt chương trình vào bộ nhớ thực thi','Tham chiếu nội dung trong bộ nhớ'],a:0},
+{t:'arch',q:'Khái niệm stored-program đề cập đến điều gì?',opts:['Nguyên lý thực thi chương trình tự động','Các tác vụ chủ yếu của một CPU','Các trạng thái hoạt động trong chu kỳ chỉ thị','Nguyên lý truy xuất nội dung trong bộ nhớ'],a:0},
+{t:'arch',q:'Máy tính theo mô hình Harvard sử dụng cho các ứng dụng có yêu cầu như thế nào?',opts:['Yêu cầu nghiêm ngặt về độ trễ','Yêu cầu nghiêm ngặt về công suất','Yêu cầu nghiêm ngặt về độ chính xác','Yêu cầu nghiêm ngặt về kích thước'],a:0},
+{t:'arch',q:'Địa chỉ quay về chương trình chính từ chương trình con phục vụ ngắt được lưu vào đâu trước khi chương trình con phục vụ ngắt được thực hiện?',opts:['Bảng vectơ ngắt','Vùng nhớ ngăn xếp','Cặp thanh ghi CS:IP','Vùng nhớ dành riêng cho chương trình'],a:1},
+{t:'arch',q:'Người ta đánh giá sự phát triển của máy tính qua các giai đoạn dựa vào tiêu chí nào?',opts:['Mức độ tích hợp của các vi mạch điện tử trong máy tính','Sự phát triển của các thiết bị ngoại vi','Tốc độ tính toán của máy tính','Cả A và C đúng'],a:3},
+{t:'arch',q:'Chương trình chính Main và chương trình con Proc1 và Proc2 nằm trong bộ nhớ như sau, thứ tự thực thi chương trình lần lượt tại các địa chỉ là',opts:['4000→4100→4101→4600→4800→4601→4650→4800→4651→4101','4000→4100→4500→4600→4800→4601→4650→4800→4651→4101','4000→4100→4500→4600→4800→4601→4650→4800→4651→4800','4000→4100→4500→4600→4601→4601→4650→4800→4651→4101'],a:1},
+{t:'arch',q:'Phát biểu nào sau đây là ĐÚNG?',opts:['Biên dịch là quá trình chuyển 1 chương trình được viết từ ngôn ngữ mức cao sang ngôn ngữ mà máy tính có thể hiểu được','Biên dịch là quá trình vừa chuyển và thực hiện luôn từng lệnh','Biên dịch và thông dịch là quá trình tạo ra ngôn ngữ máy','Biên dịch và thông dịch là quá trình tạo ra một chương trình được viết bằng ngôn ngữ mà máy có thể hiểu được'],a:0},
+{t:'arch',q:'Trình biên dịch có nhiệm vụ gì?',opts:['Chuyển chỉ thị thành tín hiệu điều khiển','Thực thi chương trình máy tính','Qui định lên tập tín hiệu điều khiển','Nạp chỉ thị cho máy tính'],a:0},
+{t:'arch',q:'Trong trường hợp biểu diễn số nguyên theo số bù hai thì số nhị phân 10001111 là biểu diễn cho số nào?',opts:['-113','-15','-143','-16'],a:0},
+{t:'arch',q:'Chương trình chạy theo tuần tự chỉ thị từ trên xuống dưới là do yếu tố nào quyết định?',opts:['Nạp chỉ thị dựa theo PC','Sắp xếp bộ nhớ','Sự điều khiển của CPU','Kết quả tự nhiên'],a:0},
+{t:'arch',q:'Yếu tố nào giúp thực thi chương trình một cách tự động?',opts:['Truy xuất vị trí bộ nhớ dựa theo nội dung thanh ghi PC','Cơ chế tính toán và thực thi trong chu kỳ chỉ thị','Tác động liên hoàn của ngắt lên chương trình','Ghi địa chỉ tức thời của chỉ thị lên thanh ghi'],a:0},
+{t:'arch',q:'Trong một chu kỳ chỉ thị, chu kỳ nạp chỉ thị kết thúc tại trạng thái nào?',opts:['Giải mã chỉ thị','Tính toán địa chỉ của toán hạng','Xử lý chỉ thị','Ghi bộ nhớ'],a:0},
+{t:'arch',q:'Trạng thái nào sau đây không thuộc về chu kỳ thực thi chỉ thị?',opts:['Tính toán địa chỉ chỉ thị','Tính toán địa chỉ toán hạng','Giải mã chỉ thị','Lưu kết quả'],a:0},
+{t:'arch',q:'Điều gì diễn ra trong máy tính khi hệ điều hành bắt đầu cho chạy một chương trình đang được lưu trong bộ nhớ chính (RAM)?',opts:['Địa chỉ đầu của chương trình được nạp vào thanh ghi PC','Chương trình được nạp từ đĩa cứng vào bộ nhớ RAM','Chỉ thị được nạp từ bộ nhớ vào thanh ghi MAR','Chỉ thị được nạp từ bộ nhớ vào thanh ghi MBR'],a:0},
+{t:'arch',q:'Thanh ghi nào sau đây là tương đương với PC?',opts:['Instruction pointer','Stack pointer','Index register','Program status'],a:0},
+{t:'arch',q:'Tính tự động trong thực thi chương trình có được nhờ vào điều gì?',opts:['Tính năng của bộ đếm số PC','Tính năng của thành phần stored program','Tính năng tự động hóa của CPU','Tính năng đặc biệt được thiết kế trong tập chỉ thị'],a:0},
+{t:'arch',q:'Thanh ghi nào thường đóng vai trò toán hạng ngầm trong chỉ thị?',opts:['AC','IBR','MAR','MBR'],a:0},
+{t:'arch',q:'Thanh ghi nào được dùng điều khiển truy xuất bộ nhớ chính?',opts:['MAR','IR','IBR','MQ'],a:0},
+{t:'arch',q:'Thanh ghi nào có chức năng đệm dữ liệu vào ra CPU?',opts:['MBR','MAR','IBR','AC'],a:0},
+{t:'arch',q:'Chu kỳ chỉ thị là gì?',opts:['là khoảng thời gian hoàn thành một chỉ thị','là khoảng thời gian nạp một chỉ thị','là khoảng thời gian xử lý một chỉ thị','là khoảng thời gian lặp lại một chỉ thị'],a:0},
+{t:'arch',q:'Thực thi chương trình tự động có nghĩa là gì?',opts:['Máy tính tự động nạp chỉ thị để thực thi','Máy tính tự động nạp chương trình từ đĩa cứng để thực thi','Máy tính tự động kết thúc chương trình','Máy tính tự động phân biệt giữa các chương trình'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây là đúng nhất khi so sánh ngôn ngữ mức cao và hợp ngữ?',opts:['Khi dùng ngôn ngữ mức cao để viết chương trình, máy tính chạy chương trình chậm là do quá trình biên dịch','Khi dùng hợp ngữ để viết chương trình, máy tính chạy chương trình chậm là do quá trình biên dịch','Khi dùng ngôn ngữ mức cao để viết chương trình, máy tính chạy chương trình nhanh là nhờ trình biên dịch hỗ trợ','Khi dùng hợp ngữ để viết chương trình, máy tính chạy chương trình nhanh là nhờ trình biên dịch hỗ trợ'],a:0},
+{t:'arch',q:'Chế độ địa chỉ (addressing mode) đề cập đến điều gì?',opts:['Qui tắc xác định vị trí mà chỉ thị tham chiếu đến','Nơi chứa dữ liệu và chỉ thị hiệu quả','Qui tắc tính toán địa chỉ của thanh ghi chỉ thị','Qui tắc tính toán nội dung trong chỉ thị'],a:0},
+{t:'arch',q:'Địa chỉ hiệu quả (effective address) là gì?',opts:['Địa chỉ chứa dữ liệu cần sử dụng','Địa chỉ chứa con trỏ chỉ đến dữ liệu','Địa chỉ ghi trên chỉ thị','Không câu nào đúng'],a:0},
+{t:'arch',q:'Chế độ địa chỉ (addressing mode) được dùng trong máy tính IAS của John Von Neumann là gì?',opts:['Trực tiếp','Gián tiếp','Tức thời','Thanh ghi nền'],a:0},
+{t:'arch',q:'Hợp ngữ (assembly language) là gì?',opts:['Ngôn ngữ lập trình được hình thành nhờ trình biên dịch mức thấp','Ngôn ngữ lập trình được hình thành nhờ trình biên dịch mức cao','Ngôn ngữ lập trình mức thấp riêng cho máy tính John Von Neumann','Ngôn ngữ lập trình đầu vào của trình biên dịch mức cao'],a:0},
+{t:'arch',q:'Phát biểu nào sau đây là sai về hợp ngữ?',opts:['Tất cả các loại máy tính khác nhau đều có chung hợp ngữ','Hợp ngữ có thể được dịch ra từ ngôn ngữ cấp cao hơn','Hợp ngữ được xây dựng để dùng thay cho mã máy trong lập trình','Hợp ngữ là ngôn ngữ lập trình mức thấp'],a:0},
+{t:'arch',q:'Tập chỉ thị có bao nhiêu chỉ thị là tùy thuộc vào điều gì?',opts:['Số tập tín hiệu điều khiển mà general-purpose hardware có thể xử lý','Số lượng mã lệnh (opcode)','Khả năng đáp ứng của trình biên dịch (compiler)','Số đường địa chỉ'],a:0},
+{t:'arch',q:'Nếu giá trị thanh ghi CS=2D45H và IP=0108H thì lệnh kế tiếp được đặt ở địa chỉ nào trong bộ nhớ?',opts:['2D358H','3D458H','3D358H','2D558H'],a:3},
+{t:'arch',q:'Chọn phát biểu đúng về khả năng tự động thực thi chương trình?',opts:['Khả năng tự động thực thi chương trình có từ máy tính thế hệ thứ hai','Khả năng tự động thực thi chương trình chỉ có trong máy tính của John Von Neumann','Khả năng tự động thực thi chương trình không có trong máy tính dùng kiến trúc Harvard','Khả năng tự động thực thi chương trình có từ máy tính thế hệ thứ nhất'],a:3},
+{t:'arch',q:'Trong chỉ thị cộng của máy tính IAS yếu tố ngầm là gì?',opts:['Toán hạng nguồn và toán hạng đích','Mã lệnh của chỉ thị','Tất cả các toán hạng','Địa chỉ của chỉ thị'],a:0},
+{t:'arch',q:'Trong chỉ thị của máy tính IAS của John Von Neumann có thiết kế như thế nào?',opts:['Một toán hạng là địa chỉ','Hai toán hạng là địa chỉ','Một toán hạng là địa chỉ và một là thanh ghi','Hai toán hạng là thanh ghi'],a:0},
+{t:'arch',q:'Trong chế độ địa chỉ gián tiếp, chỉ thị phép tính cộng add 50CE có nghĩa là gì?',opts:['Cộng nội dung tại con trỏ được chứa trong 50CE với nội dung của thanh ghi AC','Cộng nội dung của thanh ghi AC với con trỏ 50CE','Cộng nội dung của thanh ghi AC với 50CE','Cộng 50CE với nội dung con trỏ AC'],a:0},
+// ==================== CPU & THANH GHI ====================
+{t:'cpu',q:'CPU là viết tắt của các từ nào?',opts:['Central Processing Unit','Control Processing Unit','Command Program Unit','Counting Program Unit'],a:0},
+{t:'cpu',q:'ALU là viết tắt của các từ nào?',opts:['Arithmetic Logic Unit','Arithmetic Logical Unit','Algorithm Logic Unit','Algorithm Logical Unit'],a:0},
+{t:'cpu',q:'Trong các bộ phận sau, bộ phận nào thuộc bộ xử lý trung tâm?',opts:['Bộ nhớ chính','Đơn vị phối ghép vào ra','Tập các thanh ghi đa năng','Bus hệ thống'],a:2},
+{t:'cpu',q:'Trong các bộ phận sau, bộ phận nào không thuộc bộ xử lý trung tâm?',opts:['Đơn vị phối ghép vào ra','Khối xử lý số học và logic','Tập các thanh ghi đa năng','Khối điều khiển'],a:0},
+{t:'cpu',q:'Đối với ALU, phát biểu nào sau đây là đúng?',opts:['Thực thi phép toán số học','Thực thi phép toán logic','Cả A và B','Điều khiển quá trình thực thi'],a:2},
+{t:'cpu',q:'Đối với ALU, phát biểu nào sau đây là sai?',opts:['Thực hiện phép cộng trừ','Thực hiện phép tính căn bậc hai','Thực hiện phép dịch bit','Thực hiện phép so sánh'],a:1},
+{t:'cpu',q:'Kết quả sau mỗi bước tính của ALU thường được lưu ở đâu?',opts:['Vùng nhớ Heap','Accumulators','Registers','Vùng nhớ Stack'],a:1},
+{t:'cpu',q:'CPU nhận chỉ thị từ',opts:['Bộ nhớ hoặc thiết bị ngoại vi','Bộ nhớ','Thiết bị ngoại vi','BUS'],a:1},
+{t:'cpu',q:'CPU nhận dữ liệu từ',opts:['Bộ nhớ hoặc thiết bị ngoại vi','Bộ nhớ','Thiết bị ngoại vi','BUS'],a:0},
+{t:'cpu',q:'Đâu không là thành phần cơ bản bên trong bộ vi xử lý?',opts:['ALU (Arithmetic and Logic Unit)','Control Unit','DRAM','Các thanh ghi'],a:2},
+{t:'cpu',q:'Trong bộ vi xử lý 8086 là bộ vi xử lý có',opts:['8 bit dữ liệu và 20 bit địa chỉ','16 bit dữ liệu và 20 bit địa chỉ','8 bit dữ liệu và 32 bit địa chỉ','16 bit dữ liệu và 32 bit địa chỉ'],a:1},
+{t:'cpu',q:'Cấu trúc của bộ vi xử lý 8086 gồm bao nhiêu khối chính?',opts:['1','2','3','4'],a:1},
+{t:'cpu',q:'Thanh ghi nào được khởi tạo đầu tiên khi thực hiện một chương trình?',opts:['MDR','PC','IR','MAR'],a:1},
+{t:'cpu',q:'MIPS là đơn vị đo lường gì bên trong máy tính?',opts:['Số triệu chỉ thị được thực thi trong một giây','Số triệu bit được truyền trong một giây','Số triệu byte được xử lý trong một giây','Số triệu xung đồng hồ trong một giây'],a:0},
+{t:'cpu',q:'Khi gọi máy tính 32 bit hay 64 bit có nghĩa là gì?',opts:['Kích thước thanh ghi bên trong CPU là 32 hay 64 bit','Kích thước bus dữ liệu của CPU là 32 hay 64 bit','Kích thước bus địa chỉ của CPU là 32 hay 64 bit','Kích thước bus điều khiển của CPU là 32 hay 64 bit'],a:0},
+{t:'cpu',q:'Đối với thanh ghi trạng thái trong CPU, phát biểu nào sau đây là đúng?',opts:['Không chứa các cờ phép toán','Chỉ chứa các cờ phép toán','Không chứa các cờ điều khiển','Chứa các cờ điều khiển'],a:3},
+{t:'cpu',q:'Đối với thanh ghi trạng thái trong CPU, phát biểu nào sau đây là sai?',opts:['Thanh ghi trạng thái còn gọi là thanh ghi cờ','Thanh ghi trạng thái chứa các trạng thái xử lý','Chỉ có 1 loại cờ trong thanh ghi trạng thái','Có nhiều cờ trạng thái trong thanh ghi trạng thái'],a:2},
+{t:'cpu',q:'PSW là thành phần gì?',opts:['Thanh ghi giữ mã điều kiện và trạng thái','Thanh ghi giữ trạng thái và điều khiển','Thành phần giải mã địa chỉ trong máy tính John Von Neumann','Thành phần hỗ trợ ánh xạ cache'],a:0},
+{t:'cpu',q:'Cờ CF (Carry Flag) - phát biểu nào sau đây là đúng?',opts:['Được thiết lập khi phép toán có nhớ ra khỏi bit cao nhất','Được thiết lập khi phép toán không có nhớ ra khỏi bit cao nhất','Đây là cờ báo tràn đối với số có dấu','Đây là cờ thể hiện dấu khi biểu diễn số có dấu'],a:0},
+{t:'cpu',q:'Cờ OF (Overflow Flag) - phát biểu nào sau đây là đúng?',opts:['Được thiết lập khi cộng hai số cùng dấu cho kết quả khác dấu','Được thiết lập khi cộng hai số khác dấu cho kết quả âm','Được thiết lập khi cộng hai số cùng dấu cho kết quả cùng dấu','Đây là cờ báo tràn đối với số không dấu'],a:0},
+{t:'cpu',q:'Thanh ghi AX được tạo thành từ nhóm',opts:['AH & AL','BH & BL','CH & CL','DH & DL'],a:0},
+{t:'cpu',q:'Thanh ghi SP là',opts:['Stack pointer','Single pointer','Source pointer','Destination pointer'],a:0},
+{t:'cpu',q:'Thanh ghi BP là',opts:['Base pointer','Binary pointer','Bit pointer','Digital pointer'],a:0},
+{t:'cpu',q:'Thanh ghi SS là',opts:['Stack segment','Single stack','Sequence stack','Service stack'],a:0},
+{t:'cpu',q:'Thanh ghi DS là',opts:['Data segment','Digital segment','Divide segment','Decode segment'],a:0},
+{t:'cpu',q:'Thanh ghi IP là',opts:['Instruction pointer','Index pointer','Inline pointer','Internet pointer'],a:0},
+{t:'cpu',q:'Cờ SF là',opts:['Sign flag','Service flag','Single flag','Condition flag'],a:0},
+{t:'cpu',q:'Cờ OF là',opts:['Overflow flag','Overdue flag','One flag','Over flag'],a:0},
+{t:'cpu',q:'Cờ IF là',opts:['Interrupt flag','Initial flag','Indicate flag','Inter flag'],a:0},
+{t:'cpu',q:'Cờ CF là',opts:['Carry flag','Condition flag','Common flag','Single flag'],a:0},
+{t:'cpu',q:'Thanh ghi CS, DS, SS, ES là các thanh ghi',opts:['Thanh ghi đa năng','Thanh ghi con trỏ và chỉ số','Thanh ghi đoạn','Thanh ghi cờ'],a:2},
+{t:'cpu',q:'Thanh ghi quản lý đoạn bộ nhớ chứa ngăn xếp',opts:['CS','DS','SS','ES'],a:2},
+{t:'cpu',q:'Thanh ghi nào được dùng để lưu trữ địa chỉ cổng vào ra khi bộ vi xử lý thao tác với các thiết bị ngoại vi?',opts:['AX','BX','CX','DX'],a:3},
+{t:'cpu',q:'Trong chu kỳ chỉ thị của máy tính cơ bản ban đầu có bao nhiêu trạng thái khác biệt?',opts:['Có 7 trạng thái khác biệt','Có 5 trạng thái khác biệt','Có 6 trạng thái khác biệt','Có 8 trạng thái khác biệt'],a:0},
+{t:'cpu',q:'Trong chu kỳ chỉ thị không ngắt có bao nhiêu trạng thái?',opts:['7 trạng thái','8 trạng thái','6 trạng thái','9 trạng thái'],a:0},
+{t:'cpu',q:'Có bao nhiêu nhóm thanh ghi trong máy tính?',opts:['2','3','4','5'],a:0},
+{t:'cpu',q:'Đối với các thanh ghi trong CPU, phát biểu nào sau đây là sai?',opts:['Người lập trình có thể thay đổi nội dung mọi thanh ghi','Nằm trong CPU','Chứa các thông tin tạm thời','Là mức đầu tiên trong hệ thống nhớ'],a:0},
+{t:'cpu',q:'Đối với các thanh ghi trong CPU, phát biểu nào sau đây là đúng?',opts:['Đều là các thanh ghi dữ liệu','Chứa trạng thái của các thiết bị ngoại vi','Có loại thanh ghi không lập trình được','Mọi thanh ghi đều có thể lập trình được'],a:2},
+{t:'cpu',q:'Đối với vùng nhớ ngăn xếp, phát biểu nào sau đây là sai?',opts:['Là vùng nhớ có cấu trúc LIFO','Là vùng nhớ có cấu trúc FIFO','Con trỏ ngăn xếp luôn trỏ vào đỉnh ngăn xếp','Khi cất thêm thông tin vào ngăn xếp, con trỏ ngăn xếp giảm'],a:1},
+{t:'cpu',q:'Đối với các thanh ghi địa chỉ trong CPU, phát biểu nào sau đây là sai?',opts:['Bộ đếm chương trình (PC) quản lý địa chỉ vùng lệnh','Thanh ghi lệnh (IR) quản lý địa chỉ vùng lệnh','Thanh ghi con trỏ dữ liệu (DP) quản lý địa chỉ vùng dữ liệu','Thanh ghi con trỏ ngăn xếp (SP) quản lý địa chỉ vùng ngăn xếp'],a:1},
+{t:'cpu',q:'Đối với khối điều khiển (CU) bên trong CPU, phát biểu nào sau đây là đúng?',opts:['Nhận tín hiệu từ CPU gửi đến','Không nhận tín hiệu từ thiết bị ngoại vi','Giải mã lệnh được chuyển đến từ thanh ghi lệnh','Thực hiện phép toán số học và logic'],a:2},
+{t:'cpu',q:'Số bước cơ bản khi thực hiện 1 lệnh không bao gồm ngắt trong bộ xử lý 8086 là',opts:['6 bước','3 bước','5 bước','4 bước'],a:2},
+{t:'cpu',q:'Thanh ghi BX có thể sử dụng để',opts:['Chứa một dữ liệu','Chứa một địa chỉ độ dời','Một địa chỉ đoạn','Chứa một dữ liệu và một địa chỉ độ dời'],a:3},
+{t:'cpu',q:'Trong bộ vi xử lý 8086, bộ phận nào thực hiện giải mã lệnh?',opts:['Khối EU','Khối ALU','Khối điều khiển BUS','Bộ đệm lệnh'],a:0},
+{t:'cpu',q:'Đơn vị thi hành (EU) và đơn vị giao tiếp BUS (BIU) trong 8086:',opts:['BIU thực thi xong, EU mới thực thi','Song song với nhau','EU thực thi xong, BIU mới thực thi','Hoạt động độc lập nhau'],a:1},
+{t:'cpu',q:'Địa chỉ CS:IP chỉ địa chỉ lệnh sắp được thực hiện trong đoạn nào sau đây?',opts:['Đoạn dữ liệu','Đoạn ngăn xếp','Đoạn mã','Đoạn dữ liệu phụ'],a:2},
+{t:'cpu',q:'Đoạn dữ liệu có dung lượng là bao nhiêu?',opts:['64KByte','64Kbit','64 Mbyte','64 Mbit'],a:0},
+{t:'cpu',q:'Các thanh ghi nào giữ kết quả trong các lệnh nhân chia 16 bit?',opts:['AX và DX','BX và CX','CX và DX','AX và DI'],a:0},
+{t:'cpu',q:'Trong lập trình hợp ngữ 8086, khai báo kích thước bộ nhớ trong trường',opts:['Model','Stack','Data','Code'],a:0},
+{t:'cpu',q:'Thanh ghi CS lưu cái gì trong code segment?',opts:['instruction codes','instruction path','instruction stream','instruction stream line'],a:0},
+{t:'cpu',q:'Thanh ghi trạng thái (status register) còn được gọi là',opts:['flags','stack','counter','accumulator'],a:0},
+{t:'cpu',q:'Thanh ghi cờ 16 bit của bộ xử lý 8086 được dùng để chỉ',opts:['Một condition từ kết quả tính toán trong ALU','Một condition của bộ nhớ','Kết quả của phép cộng','Kết quả của phép trừ'],a:0},
+{t:'cpu',q:'Bộ xứ lý 8086 nạp lần lượt các chỉ thị từ __ của bộ nhớ',opts:['Code segment','IP','ES','SS'],a:0},
+{t:'cpu',q:'Bộ biên dịch mức thấp thuộc về thành phần nào trong máy tính?',opts:['CPU','Bộ nhớ chính','Hệ thống bus','Hệ thống I/O'],a:0},
+// ==================== NGẮT & PIPELINE ====================
+{t:'interrupt',q:'Các loại ngắt trong hệ thống máy tính bao gồm',opts:['Ngắt cứng, ngắt mềm, ngắt trung gian','Ngắt cứng, ngắt mềm, ngắt ngoại lệ','Ngắt cứng, ngắt ngoại lệ, ngắt INTR','Ngắt mềm, ngắt NMI, ngắt cứng'],a:1},
+{t:'interrupt',q:'Trong hệ thống máy tính, bộ đếm chương trình là',opts:['Thanh ghi chứa lệnh sắp thực hiện','Thanh ghi đa năng','Thanh ghi chứa địa chỉ lệnh','Thanh ghi chứa địa chỉ lệnh sắp thực hiện'],a:3},
+{t:'interrupt',q:'Khi có ngắt từ thiết bị ngoại vi, bộ xử lý sẽ',opts:['Từ chối ngắt, không phục vụ','Phục vụ ngắt ngay, sau đó thực hiện chương trình','Thực hiện xong lệnh hiện tại, rồi phục vụ ngắt, cuối cùng quay lại thực hiện tiếp chương trình','Thực hiện xong chương trình rồi thực hiện ngắt'],a:2},
+{t:'interrupt',q:'Khi CPU đáp ứng một yêu cầu ngắt thì sự kiện nào xảy ra?',opts:['Nạp địa chỉ chương trình phục vụ ngắt vào PC','CPU dừng ngay, không thực hiện chỉ thị hiện hành','CPU nạp ngữ cảnh vào thanh ghi AC','Nạp nội dung đáp ứng phục vụ ngắt vào PC'],a:0},
+{t:'interrupt',q:'Cơ chế nào sau đây giúp tăng cường cả về tính năng và hiệu năng của máy tính?',opts:['Interrupt','DMA','Cache','RAID'],a:0},
+{t:'interrupt',q:'Pipelining làm gia tăng __ của bộ xử lý',opts:['Thông lượng (throughput)','Dung lượng lưu trữ','Khả năng dự đoán','Độ trễ'],a:0},
+{t:'interrupt',q:'Có bao nhiêu loại hazard?',opts:['3','4','5','6'],a:0},
+{t:'interrupt',q:'Hazard nào xảy ra nếu việc đọc diễn ra trước khi thao tác ghi hoàn tất?',opts:['Data hazard','Structure hazard','Output dependency','Control hazard'],a:0},
+{t:'interrupt',q:'Khi hai chỉ thị trong pipeline cùng yêu cầu một tài nguyên thì hazard nào xảy ra?',opts:['Structure hazard','Data hazard','Control hazard','Branch hazard'],a:0},
+{t:'interrupt',q:'Xét các công đoạn thực thi của bộ xử lý, thứ tự nào là đúng?',opts:['Giải mã lệnh → nhận dữ liệu → xử lý dữ liệu → ghi dữ liệu → nhận lệnh','Nhận lệnh → Giải mã lệnh → nhận dữ liệu → xử lý dữ liệu → ghi dữ liệu','Nhận lệnh → nhận dữ liệu → Giải mã lệnh → xử lý dữ liệu → ghi dữ liệu','Nhận dữ liệu → xử lý dữ liệu → nhận lệnh → Giải mã lệnh → ghi dữ liệu'],a:1},
+{t:'interrupt',q:'RISC là viết tắt của',opts:['Reduced Instruction Set Computer','Reverse Instruction Set Computer','Reduced Implied Set Computer','Reverse Implied Set Computer'],a:0},
+{t:'interrupt',q:'SISD là viết tắt của',opts:['Single Instruction stream, Single Data stream','Simple Instruction stream, Simple Data stream','Stack Instruction stream, Stack Data stream','Storage Instruction stream, Storage Data stream'],a:0},
+{t:'interrupt',q:'Loại ngắt nào sau đây giúp rút ngắn thời gian chạy xong chương trình?',opts:['I/O','Timer','Error','Program'],a:0},
+{t:'interrupt',q:'Thời điểm nào cho phép dừng CPU để chuyển phục vụ?',opts:['Kết thúc lưu kết quả','Kết thúc giải mã lệnh','Kết thúc lấy toán hạng','Kết thúc lấy lệnh'],a:0},
+{t:'interrupt',q:'Mặt tiêu cực khi áp dụng cơ chế ngắt là gì?',opts:['Xuất hiện thêm trạng thái trong chu kỳ chỉ thị và xử lý đa ngắt','Trong máy tính xuất hiện tình huống đa chương phức tạp','CPU bị tranh chấp bus liên tục khiến cho hiệu suất máy tính giảm','Làm cho việc thực thi chương trình bị gián đoạn liên tục'],a:0},
+{t:'interrupt',q:'Với công đoạn nhận lệnh của CPU, thứ tự thực hiện là',opts:['Bộ đếm chương trình (PC) → bộ nhớ → thanh ghi lệnh','Bộ nhớ → bộ đếm chương trình (PC) → thanh ghi lệnh','Bộ nhớ → thanh ghi lệnh → bộ đếm chương trình (PC)','Bộ đếm chương trình (PC) → thanh ghi lệnh → bộ nhớ'],a:0},
+{t:'interrupt',q:'Với công đoạn giải mã lệnh của CPU, thứ tự thực hiện là',opts:['Thanh ghi lệnh → giải mã → khối điều khiển → tín hiệu điều khiển','Thanh ghi lệnh → khối điều khiển → tín hiệu điều khiển → giải mã','Khối điều khiển → Thanh ghi lệnh → giải mã → tín hiệu điều khiển','Thanh ghi lệnh → khối điều khiển → giải mã → tín hiệu điều khiển'],a:3},
+{t:'interrupt',q:'Với công đoạn nhận dữ liệu của CPU, thứ tự thực hiện là',opts:['Địa chỉ → tập thanh ghi (CPU) → ngăn nhớ','Địa chỉ → ngăn nhớ → tập thanh ghi (CPU)','Tập thanh ghi (CPU) → địa chỉ → ngăn nhớ','Ngăn nhớ → tập thanh ghi (CPU) → địa chỉ'],a:1},
+{t:'interrupt',q:'Cơ chế ngắt được đưa vào máy tính xuất phát từ nhu cầu nào?',opts:['Nhu cầu điều chuyển sự phục vụ của CPU','Nhu cầu tăng tốc độ bus','Nhu cầu cải thiện khả năng lưu trữ','Nhu cầu xử lý của I/O'],a:0},
+{t:'interrupt',q:'Điều gì xảy ra trong máy tính khi chương trình yêu cầu truy xuất dữ liệu trên đĩa cứng và quá trình đọc đĩa đã kết thúc?',opts:['Có yêu cầu ngắt gửi đến CPU','Có khởi động DMA để truyền dữ liệu cho cache','Có sự cấp bus cho đĩa','Có thay đổi không gian bộ nhớ'],a:0},
+{t:'interrupt',q:'Loại ngắt (interrupt type) đề cập đến điều gì?',opts:['Trường hợp cụ thể sử dụng cơ chế ngắt','Bản chất của ngắt được dùng trong chương trình','Số lượng ngắt được dùng trong chương trình','Cường độ của quá trình ngắt'],a:0},
+{t:'interrupt',q:'Ngữ cảnh cần phải lưu mỗi khi CPU bị ngắt là gì?',opts:['Nội dung bộ nhớ và thanh ghi tương ứng của chương trình đang thực thi hiện hành','Hình ảnh của bộ nhớ chính vào thời điểm xảy ra ngắt','Toàn cảnh của các chương trình đang chạy bên trong máy tính vào thời điểm xảy ra ngắt','Ngôn ngữ phản ánh hoàn cảnh hay trạng thái hiện hành của máy tính'],a:0},
+{t:'interrupt',q:'Khi có nhiều yêu cầu phục vụ gửi đến CPU thì đó là tình huống gì?',opts:['Tình huống đa ngắt','Tình huống đa bộ xử lý','Tình huống tranh chấp bus','Tình huống tranh chấp bộ nhớ'],a:0},
+{t:'interrupt',q:'Đâu là giải pháp xử lý nhiều ngắt?',opts:['Sắp xếp ưu tiên theo tính chất của yêu cầu','Theo thứ tự đến trước phục vụ trước','Theo qui tắc yêu cầu nào cần thời gian ít hơn được phục vụ trước','Theo qui tắc yêu cầu nào cần thời gian nhiều hơn được phục vụ trước'],a:0},
+{t:'interrupt',q:'Đối với pipeline, phát biểu nào sau đây là sai?',opts:['Pipeline là kỹ thuật truyền dữ liệu trong máy tính','Pipeline là kỹ thuật thực thi chương trình trong máy tính','Pipeline giống như dây chuyền lắp ráp trong nhà máy','Trong pipeline các chỉ thị như được xếp chồng lên nhau'],a:0},
+{t:'interrupt',q:'Đối với pipeline k đoạn, phát biểu nào sau đây là đúng?',opts:['Cơ chế pipeline làm tăng thông lượng (throughput) của hệ thống','Pipeline giảm độ trễ của mỗi chỉ thị','Độ tăng tốc tối thiểu có thể đạt được với pipeline k tầng là k','Các giai đoạn pipeline không đồng nhất làm giảm tốc độ tổng thể'],a:0},
+{t:'interrupt',q:'Các phát biểu nào sau đây đối với pipeline k đoạn là đúng: (1) Độ tăng tốc tối đa theo lý thuyết là k (2) Không thể đạt được độ tăng tốc tối đa k (3) Tất cả các giai đoạn đều cần thời gian bằng nhau',opts:['(1) và (2)','(2) và (3)','(1) và (3)','(1), (2) và (3)'],a:0},
+{t:'interrupt',q:'Một hệ thống không pipeline xử lý tác vụ cần 50ns. Máy pipeline 6 đoạn có chu kỳ 10ns. Tỉ lệ tăng tốc cho 500 tác vụ là?',opts:['4,95','6','5,7','5,5'],a:0},
+{t:'interrupt',q:'Một pipeline 5 giai đoạn có độ trễ 150ns, 120ns, 150ns, 160ns, 140ns. Thanh ghi giữa các giai đoạn 5ns. Tổng thời gian cho 100 chỉ thị độc lập là ___ nano giây?',opts:['17160','25431','18400','20232'],a:0},
+// ==================== BỘ NHỚ (RAM/ROM/CACHE) ====================
+{t:'mem',q:'Đặc điểm của bộ nhớ ROM',opts:['Cho phép ghi dữ liệu','Chỉ cho phép đọc dữ liệu','Bị mất dữ liệu khi không có nguồn cấp','Cho phép ghi/đọc dữ liệu đồng thời'],a:1},
+{t:'mem',q:'ROM là bộ nhớ có đặc điểm',opts:['Cho phép truy nhập nhanh hơn bộ nhớ RAM','Nội dung không bị thay đổi khi mất nguồn cấp','Lưu trữ được nhiều thông tin hơn bộ nhớ RAM','Được sử dụng làm bộ nhớ Cache'],a:1},
+{t:'mem',q:'Chương trình BIOS được lưu trữ trong bộ nhớ thuộc loại nào?',opts:['RAM','ROM','Ổ đĩa cứng','Cache'],a:1},
+{t:'mem',q:'Đặc điểm của bộ nhớ RAM',opts:['Cho phép ghi dữ liệu','Chỉ cho phép đọc dữ liệu','Không bị mất dữ liệu khi không có nguồn cấp','Cho phép ghi/đọc dữ liệu đồng thời tại một vị trí nhớ'],a:0},
+{t:'mem',q:'Đối với RAM, phát biểu nào sau đây đúng?',opts:['Là loại bộ nhớ không khả biến','RAM là viết tắt của: Read Access Memory','SRAM được chế tạo từ các tụ điện','Là nơi lưu giữ các thông tin mà máy tính đang xử lý'],a:3},
+{t:'mem',q:'Bộ nhớ nào cần được thực hiện làm tươi?',opts:['ROM','SRAM','RAM','DRAM'],a:3},
+{t:'mem',q:'Bộ nhớ Cache được cấu trúc từ loại bộ nhớ nào?',opts:['ROM','SRAM','DRAM','Flash ROM'],a:1},
+{t:'mem',q:'Chức năng của bộ nhớ Cache trong máy tính là gì?',opts:['Chứa các toán hạng là hằng số','Chuẩn bị trước dữ liệu mà bộ vi xử lý cần sử dụng','Lưu giữ các tham số hệ thống','Giúp mở rộng dung lượng bộ nhớ'],a:1},
+{t:'mem',q:'Ưu điểm của bộ nhớ Cache là',opts:['Dung lượng lớn','Thời gian truy nhập lớn','Thời gian truy nhập nhỏ','Chi phí thấp'],a:2},
+{t:'mem',q:'Đối với cache, có các kỹ thuật ánh xạ địa chỉ nào?',opts:['Trực tiếp, liên kết toàn phần, liên kết tập hợp','Liên kết toàn phần, liên kết phụ thuộc, gián tiếp','Liên kết tập hợp, liên kết phần tử, gián tiếp','Trực tiếp, liên kết phần tử, liên kết gián đoạn'],a:0},
+{t:'mem',q:'Cấu tạo của một ô nhớ SRAM bao gồm',opts:['Bao gồm ba tụ điện và ba Transistor','Bao gồm hai tụ điện và bốn Transistor','Gồm sáu Transistor','Gồm sáu tụ điện'],a:2},
+{t:'mem',q:'Cấu tạo của một ô nhớ DRAM bao gồm',opts:['Gồm hai tụ điện và một Transistor','Gồm một tụ điện và một Transistor','Gồm một tụ điện và hai Transistor','Gồm hai tụ điện và hai Transistor'],a:1},
+{t:'mem',q:'Trong biểu diễn số nguyên bù hai, số nhị phân 11101110 là số nào?',opts:['-18','-19','-238','-110'],a:0},
+{t:'mem',q:'Tại sao bộ nhớ RAM được gọi là bộ nhớ truy cập ngẫu nhiên?',opts:['Giá trị các ô nhớ là ngẫu nhiên','Truy xuất bộ nhớ theo địa chỉ được cung cấp ngẫu nhiên','Bộ nhớ gồm các module có thứ tự sắp xếp ngẫu nhiên','Thời gian truy cập vào một ô nhớ bất kỳ là ngẫu nhiên'],a:1},
+{t:'mem',q:'Các thiết lập về cấu hình phần cứng máy tính được lưu trữ tại',opts:['Hard Disk Drive','Cache','CMOS RAM','RAM'],a:2},
+{t:'mem',q:'Bộ nhớ chính được làm chủ yếu từ linh kiện nào?',opts:['RAM động','RAM tĩnh','ROM','Flash ROM'],a:0},
+{t:'mem',q:'Cache có khả năng truy cập tốc độ cao vì nguyên nhân chính sau đây',opts:['Kết nối trực tiếp với CPU','Cấu tạo đơn giản','Dung lượng nhỏ, giá thành cao','Linh kiện có chất lượng cao'],a:0},
+{t:'mem',q:'Thành phần cấu tạo chính trong một memory logic chip là',opts:['Nhiều ma trận cell xếp chồng','Một ma trận cell','Nhiều ma trận cell xếp nối tiếp','Một chuỗi cell nối tiếp'],a:0},
+{t:'mem',q:'Một memory logic chip WxB có nghĩa là',opts:['Chip có thể chứa W từ nhớ mỗi từ có B bit','Chip có thể chứa B từ nhớ mỗi từ có W bit','Chip có thể chứa WxB byte','Chip có thể chứa W từ nhớ mỗi từ có B byte'],a:0},
+{t:'mem',q:'Cấu trúc của một thanh RAM gồm',opts:['Nhiều memory logic chip được nối theo mạch giải mã địa chỉ','Nhiều memory logic chip được xếp chồng vào một chip lớn','Một memory logic chip nhiều mặt','Một memory logic chip một mặt'],a:0},
+{t:'mem',q:'Số lượng mức cache có thể có trong máy tính?',opts:['Nhiều','Một','Hai','Ba'],a:0},
+{t:'mem',q:'Có bao nhiêu loại cache trong máy tính?',opts:['2','3','4','5'],a:0},
+{t:'mem',q:'Chu kỳ làm tươi cần cho loại linh kiện nhớ nào?',opts:['RAM động','RAM tĩnh','Flash ROM','EPROM'],a:0},
+{t:'mem',q:'Phát biểu nào sau đây là sai về RAM động và RAM tĩnh?',opts:['RAM động được dùng phổ biến hơn RAM tĩnh vì có hiệu suất cao hơn RAM tĩnh','Một trong những nhược điểm của RAM động là phải làm tươi theo định kỳ','RAM tĩnh thường được dùng để làm bộ nhớ cache','Cả RAM tĩnh và RAM động đều bị xóa dữ liệu khi mất nguồn điện'],a:0},
+{t:'mem',q:'Đối với bộ nhớ chính trong máy tính, phát biểu nào sau đây là ĐÚNG?',opts:['Bộ nhớ chính chứa chương trình và dữ liệu dạng thư viện','Bộ nhớ chính có thể mở rộng dung lượng tùy ý','Bộ nhớ chính được đánh địa chỉ bởi hệ điều hành','Bộ nhớ chính được đánh địa chỉ trực tiếp bởi bộ xử lý'],a:3},
+{t:'mem',q:'Đối với bộ nhớ ROM, phát biểu nào sau đây là sai?',opts:['EPROM là loại ROM có thể xóa và ghi lại nhiều lần','Là loại bộ nhớ khả biến','Là nơi chứa các chương trình hệ thống (BIOS)','Là nơi chứa các vi chương trình'],a:1},
+{t:'mem',q:'Trong các phát biểu sau, phát biểu nào đúng về cache và RAM?',opts:['Bộ nhớ ROM không phải là bộ nhớ truy nhập ngẫu nhiên','Bộ nhớ trong có dung lượng lớn hơn bộ nhớ ngoài','Bộ nhớ Cache có tốc độ truy xuất cao hơn bộ nhớ RAM','Bộ nhớ RAM luôn có dung lượng nhỏ hơn bộ nhớ Cache'],a:2},
+{t:'mem',q:'Đối với bộ nhớ cache, phát biểu nào sau đây là đúng?',opts:['Cache có thể được đặt trên cùng chip với CPU','Bộ nhớ chính có tốc độ nhanh hơn cache','Bộ nhớ cache được đặt giữa Bộ nhớ chính và Bộ nhớ ngoài','Cache là bộ nhớ nằm tách biệt CPU'],a:0},
+{t:'mem',q:'Cache là loại bộ nhớ có đặc điểm',opts:['Có dung lượng lớn hơn bộ nhớ RAM','Cho phép truy nhập nhanh hơn so với bộ nhớ DRAM','Cho phép truy nhập nhanh hơn so với các thanh ghi của CPU','Là bộ nhớ cố định'],a:1},
+{t:'mem',q:'Trong kỹ thuật ánh xạ trực tiếp, khi truy nhập cache phát biểu nào đúng?',opts:['Mỗi block có thể ánh xạ vào một line bất kỳ','Mỗi block có thể ánh xạ vào một line bất kỳ trong một tập line xác định','Mỗi block chỉ được ánh xạ vào một line duy nhất','Mỗi block chỉ được ánh xạ vào một trong bốn line xác định'],a:2},
+{t:'mem',q:'Thời gian truy nhập bộ nhớ được tính bằng',opts:['Thời gian từ lúc khởi động chương trình tới khi nhận được dữ liệu từ bộ nhớ','Thời gian từ khi nhận lệnh tới khi nhận được dữ liệu từ bộ nhớ','Thời gian từ khi có tín hiệu Chip Enable tới khi nhận được dữ liệu','Thời gian tồn tại của dữ liệu trên Bus hệ thống'],a:1},
+{t:'mem',q:'Trong kỹ thuật ánh xạ liên kết toàn phần, các trường địa chỉ là',opts:['Tag + Word + Line','Tag + Word','Tag + Line + Word','Tag + Line'],a:1},
+{t:'mem',q:'Trong kỹ thuật ánh xạ trực tiếp, các trường địa chỉ là',opts:['Tag + Word + Line','Tag + Word','Tag + Line + Word','Tag + Line'],a:2},
+{t:'mem',q:'Trong kỹ thuật ánh xạ liên kết tập hợp, các trường địa chỉ là',opts:['Tag + Line + Word','Tag + Word','Tag + Set + Word','Tag + Line'],a:2},
+{t:'mem',q:'Đối với bộ nhớ cache, xét nguyên lý lân cận về vị trí, phát biểu nào sau đây đúng?',opts:['Từ nhớ vừa truy cập thì xác suất thấp sau đó nó sẽ được truy cập lại','Từ nhớ lân cận với từ nhớ vừa được truy cập sẽ có xác xuất cao được truy cập','Từ nhớ vừa truy cập thì chắc chắn sau đó nó sẽ không được truy cập lại','Từ nhớ vừa truy cập thì chắc chắn sau đó nó sẽ được truy cập lại'],a:1},
+{t:'mem',q:'Đối với bộ nhớ cache, các thuật toán thay thế dữ liệu là',opts:['Random, FIFO, LRU, LFU','Random, LIFO, LRU, LFU','Random, FIFO, LFU, LTU','Random, LIFO, LTU, LVU'],a:0},
+{t:'mem',q:'Cần thiết kế một thanh RAM 1Gbyte, đã có 8 chip 256M x 2, cần dùng thêm bao nhiêu chip 256 M x 1?',opts:['16','12','8','24'],a:0},
+{t:'mem',q:'Cần thiết kế một thanh RAM 1Gbyte, đã có 4 chip 256M x 4, cần dùng thêm bao nhiêu chip 256 M x 2?',opts:['8','16','32','12'],a:0},
+{t:'mem',q:'Write through và write back là đề cập đến điều gì?',opts:['Biện pháp ngăn chặn sự bất đồng về nội dung giữa cache và bộ nhớ','Biện pháp ngăn chặn sự bất đồng về nội dung giữa các cache khác nhau trong hệ đa bộ xử lý','Biện pháp ngăn chặn sự bất đồng về nội dung giữa nhiều cache và bộ nhớ','Biện pháp cải thiện hiệu quả sử dụng cache'],a:0},
+{t:'mem',q:'Mặt tiêu cực khi áp dụng cơ chế cache là gì?',opts:['Không nhất quán','Mất tham chiếu','Mất thời gian tìm kiếm','Cản trở xử lý song song'],a:0},
+{t:'mem',q:'Lý do kỹ thuật cache được đưa vào máy tính?',opts:['Rút ngắn các chu kỳ nạp chỉ thị và dữ liệu','Giảm tải cho bộ nhớ chính','Gia tăng kích thước cho bộ nhớ trong của máy tính','Tăng tốc độ làm việc của CPU'],a:0},
+{t:'mem',q:'Tham số đánh giá mức độ hiệu quả của cache là gì?',opts:['Hit ratio','Utility','MHz','GByte'],a:0},
+{t:'mem',q:'Qui định phải tuân theo khi nạp một khối bộ nhớ vào cache thay thế khối đang chiếm giữ thường được gọi là gì?',opts:['Ánh xạ cache','Thuật toán thay thế','Đồng nhất cache','Hợp nhất cache'],a:1},
+{t:'mem',q:'Nạp vào bất cứ line nào trong một nhóm là qui tắc của loại ánh xạ cache nào?',opts:['Set associative mapping','Double associative mapping','Full associative mapping','Direct mapping'],a:0},
+{t:'mem',q:'Nạp vào bất cứ line nào trong cache là qui tắc của loại ánh xạ cache nào?',opts:['Full associative mapping','Double associative mapping','Set associative mapping','Direct mapping'],a:0},
+{t:'mem',q:'Chỉ được nạp vào một line được chỉ định duy nhất là qui tắc của loại ánh xạ cache nào?',opts:['Direct mapping','Double associative mapping','Full associative mapping','Set associative mapping'],a:0},
+{t:'mem',q:'Đâu là phát biểu đúng về bộ nhớ cache?',opts:['Cache không phải là thành phần của main memory','Cache là thành phần của main memory','Mỗi vị trí của cache thuộc bản đồ địa chỉ hóa của CPU, do đó CPU có thể truy xuất cache một cách trực tiếp','Cache được làm từ RAM động'],a:0},
+{t:'mem',q:'Đơn vị quản lý bộ nhớ trong máy tính có thể là',opts:['Bộ vi xử lý','Bộ điều khiển truy nhập DMA','Bộ điều khiển BUS','Bộ vi xử lý và bộ điều khiển truy nhập DMA'],a:3},
+{t:'mem',q:'Địa chỉ thực tế mà trình quản lý bộ nhớ nhìn thấy và thao tác là',opts:['Địa chỉ vật lý','Không gian vật lý','Địa chỉ logic','Không gian địa chỉ'],a:0},
+{t:'mem',q:'Trong cấu trúc bộ nhớ dạng 2N×M, phát biểu nào dưới đây đúng?',opts:['Bộ nhớ gồm 2N Byte và M module nhớ','Bộ nhớ gồm 2N từ nhớ và M module nhớ','Bộ nhớ gồm 2N ngăn nhớ, mỗi ngăn nhớ gồm M bit','Bộ nhớ gồm 2N từ nhớ và M module nhớ'],a:2},
+{t:'mem',q:'Cho chip nhớ SRAM có dung lượng 16K x 8 bit, phát biểu nào sau đây là sai?',opts:['Có 14 đường địa chỉ','Có 8 đường dữ liệu','Các đường địa chỉ là: A0 → A13','Có 16 đường địa chỉ'],a:3},
+{t:'mem',q:'Cho chip nhớ DRAM có các tín hiệu: A0 → A15, D0 → D7, RD, WE. Phát biểu nào sau đây là đúng?',opts:['Dung lượng của chip là: 64K x 8 bit','Dung lượng của chip là: 256K x 16 bit','RD là tín hiệu điều khiển ghi dữ liệu','WE là tín hiệu điều khiển đọc dữ liệu'],a:0},
+{t:'mem',q:'Chức năng của tín hiệu Chip Enable trong IC bộ nhớ là gì?',opts:['Cho phép đọc dữ liệu trong IC bộ nhớ','Cho phép ghi dữ liệu vào IC bộ nhớ','Cho phép IC bộ nhớ hoạt động','Cho phép đọc, ghi đồng thời đối với IC bộ nhớ'],a:2},
+{t:'mem',q:'Một bộ nhớ 64 Kbit có thể được tổ chức theo kiểu nào?',opts:['64K × 1','8K × 8','16K × 4','Tất cả đều đúng'],a:3},
+{t:'mem',q:'Hợp nhất cache sẽ có hit ratio cao trong trường hợp nào?',opts:['Data-bound','CPU-bound','Memory-bound','I/O-bound'],a:0},
+{t:'mem',q:'Tách biệt cache sẽ bất lợi trong trường hợp nào?',opts:['Instruction-bound','CPU-bound','Memory-bound','I/O-bound'],a:0},
+{t:'mem',q:'Mục tiêu của việc tách on-chip cache thành data cache và instruction cache là',opts:['Để hỗ trợ xử lý song song và pipeline','Để đơn giản thiết kế và xử lý','Để giảm kích thước vật lý của CPU','Để tạo điều kiện tăng dung lượng của cache'],a:0},
+{t:'mem',q:'Phát biểu nào sau đây là sai về cache?',opts:['Trong máy tính chỉ có duy nhất một cache','Cache có thể được tích hợp vào bên trong CPU chip (on-chip cache)','Trong máy tính chỉ có duy nhất một bộ nhớ chính','Bộ nhớ trong của máy tính bao gồm cả cache'],a:0},
+// ==================== HỢP NGỮ (ASSEMBLY) ====================
+{t:'asm',q:'Lệnh nào sau đây dùng để hoán đổi nội dung hai toán hạng?',opts:['MOV','SWAP','ADD','XCHG'],a:3},
+{t:'asm',q:'Lệnh nào sau đây dùng nạp địa chỉ hiệu quả (effective address) vào thanh ghi?',opts:['LDS','MOV','LES','LEA'],a:3},
+{t:'asm',q:'Lệnh nào sau đây dùng để lấy dữ liệu từ ngăn xếp?',opts:['OUT','MOV','POP','IN'],a:2},
+{t:'asm',q:'Lệnh nào sau đây dùng để cất một byte dữ liệu vào ngăn xếp?',opts:['MOV','POP','OUT','PUSH'],a:3},
+{t:'asm',q:'Lệnh nào sau đây dùng để xuất dữ liệu ra cổng?',opts:['MOV','IN','POP','OUT'],a:3},
+{t:'asm',q:'Lệnh nào sau đây thực hiện cộng 2 toán hạng không có nhớ?',opts:['ADC','SUB','ADD','INC'],a:2},
+{t:'asm',q:'Lệnh nào sau đây thực hiện cộng 2 toán hạng có nhớ?',opts:['ADC','SUB','ADD','INC'],a:0},
+{t:'asm',q:'Lệnh nào sau đây thực hiện tăng toán hạng đích lên 1 đơn vị?',opts:['ADC','SUB','ADD','INC'],a:3},
+{t:'asm',q:'Lệnh nào sau đây thực hiện phép toán nhân?',opts:['ADD','SUB','MUL','DIV'],a:2},
+{t:'asm',q:'Lệnh nào sau đây thực hiện phép toán chia?',opts:['ADD','SUB','MUL','DIV'],a:3},
+{t:'asm',q:'Lệnh nào sau đây so sánh 2 toán hạng?',opts:['DEC','JMP','CMP','INC'],a:2},
+{t:'asm',q:'Lệnh nào sau đây là lệnh nhảy không điều kiện?',opts:['JMP','JL','LOOP','SHL'],a:0},
+{t:'asm',q:'Toán tử xóa trên stack là',opts:['POP','PUSH','FRONT','REAR'],a:0},
+{t:'asm',q:'Lệnh MOV AX, BX là một ví dụ của chế độ định địa chỉ nào?',opts:['Trực tiếp','Tức thì','Thanh ghi','Gián tiếp thanh ghi'],a:2},
+{t:'asm',q:'Hãy chỉ ra chế độ địa chỉ tức thì',opts:['MOV AL, [0243H]','MOV AL, [BX]','MOV CL, 10','MOV BX, DX'],a:2},
+{t:'asm',q:'Trong các lệnh sau đây, lệnh nào thuộc chế độ định địa chỉ gián tiếp thanh ghi?',opts:['MOV AX, [BX]','MOV AX, [0B800H]','MOV AX, BX','MOV AX, [BX] + 5'],a:0},
+{t:'asm',q:'Hãy chỉ ra đâu là chế độ địa chỉ thanh ghi',opts:['MOV AL, [BX]','MOV CL, 10','MOV BX, DX','MOV AL, [0243H]'],a:2},
+{t:'asm',q:'Hãy chỉ ra đâu là chế độ địa chỉ trực tiếp',opts:['MOV AX, DX','MOV CL, 10h','MOV AH, [2243H]','MOV AH, [AX]'],a:2},
+{t:'asm',q:'Trong chế độ địa chỉ gián tiếp thanh ghi, dữ liệu là',opts:['Giá trị trong một ô nhớ có địa chỉ mã hoá trong lệnh','Giá trị nằm trong một ô nhớ có địa chỉ giữ trong một thanh ghi','Giá trị trong một thanh ghi','Một số được mã hoá trong lệnh'],a:1},
+{t:'asm',q:'Hãy chỉ ra chế độ địa chỉ gián tiếp thanh ghi',opts:['MOV AH, BL','MOV DH, [0]','MOV AL, [BX]','MOV BX, 0'],a:2},
+{t:'asm',q:'Hãy cho biết đâu là chế độ định địa chỉ tương đối cơ sở cho toán hạng nguồn',opts:['MOV BX, [DX]+[SI]+10','MOV CX, [SI+10]','MOV CX, [BX+10]','MOV AL, [0243H]'],a:2},
+{t:'asm',q:'Hãy cho biết đâu là chế độ định địa chỉ tương đối chỉ số cho toán hạng nguồn',opts:['MOV CX, 10+[BX]','MOV BX, [BX]+[DI]+10','MOV CX, [DI]+5','OUT DX, BX'],a:2},
+{t:'asm',q:'Hãy cho biết đâu là chế độ định địa chỉ tương đối cơ sở chỉ số cho toán hạng nguồn',opts:['MOV CX, 10+[BX]','MOV BX, [BX]+[DI]+10','MOV CX, [DI]+5','OUT DX, BX'],a:1},
+{t:'asm',q:'Trong chế độ địa chỉ tương đối chỉ số, dữ liệu sử dụng trong lệnh nằm trong một ô nhớ có địa chỉ bằng',opts:['Giá trị chứa trong thanh ghi DI hoặc SI cộng với một số độ dời','Giá trị chứa trong thanh ghi DI hoặc SI','Giá trị chứa trong thanh ghi BX hoặc BP','Giá trị chứa trong BX hoặc BP cộng với giá trị chứa trong DI hoặc SI'],a:0},
+{t:'asm',q:'Để dịch trái thanh ghi AL đi 1 bit, ta dùng lệnh nào?',opts:['SHR AL,1','SHL AL,1','ROR AL,1','ROL AL,1'],a:1},
+{t:'asm',q:'Để quay phải thanh ghi AL đi 1 bit, ta dùng lệnh nào?',opts:['SHR AL,1','SHL AL,1','ROR AL,1','ROL AL,1'],a:2},
+{t:'asm',q:'Trong ngắt 21H, hàm nào dùng để nhập 1 ký tự vào từ bàn phím?',opts:['01H','02H','09H','4CH'],a:0},
+{t:'asm',q:'Hàm kết thúc chương trình trong ngắt 21H là',opts:['01H','02H','09H','4CH'],a:3},
+{t:'asm',q:'Trong ngắt 21H, hàm dùng để in 1 ký tự ra màn hình là',opts:['01H','02H','09H','4CH'],a:1},
+{t:'asm',q:'Trong ngắt 21H, hàm nào dùng để in 1 xâu ký tự ra màn hình?',opts:['01H','02H','09H','4CH'],a:2},
+{t:'asm',q:'Từ nào sau đây không phải là ký hiệu một lệnh trong ngôn ngữ assembly?',opts:['IF','ADD','DIV','MOV'],a:0},
+{t:'asm',q:'Lệnh nào sau đây được dùng để chuyển đến phần khác của chương trình?',opts:['JMP','ADD','MOV','CMP'],a:0},
+{t:'asm',q:'Lệnh PUSH chép một word vào',opts:['stack','bộ nhớ','thanh ghi','địa chỉ đích'],a:0},
+{t:'asm',q:'Lệnh POP chép một word từ',opts:['stack','bộ nhớ','thanh ghi','cache'],a:0},
+{t:'asm',q:'Sau khi thực hiện các lệnh: MOV AH,05H / MOV AL,03H / XCHG AH,AL',opts:['AH=03H, AL=05H','AH=AL=03H','AH=AL=05H','AH=05H, AL=03H'],a:0},
+{t:'asm',q:'Giả sử AX=2, BX=3, CF=1 sau lệnh ADC AX,BX sẽ có',opts:['AX=6, BX=3','AX=6, BX=0','AX=5, BX=3','AX=5, BX=0'],a:0},
+{t:'asm',q:'Giả sử AX=10, BX=15, sau đoạn: SUB AX,BX / CMP AX,0 / JG Tiep / NEG AX / JMP Next / Tiep: ADD AX,15 / Next: ADD AX,20',opts:['AX=25','AX=20','AX=5','Đáp án khác'],a:0},
+{t:'asm',q:'Sau lệnh: MOV CX,7 / MOV AX,0 / TONG: ADD AX,CX / LOOP TONG',opts:['AX=7','AX=28','AX=21','AX=25'],a:1},
+{t:'asm',q:'Sau khi thực hiện: MOV AL, 5 / MOV BL, 10 / ADD BL, AL / SUB BL, 1 - Giá trị BL?',opts:['5h','26h','0Eh','0'],a:2},
+{t:'asm',q:'Nội dung được chứa trong Stack Pointer là',opts:['Địa chỉ của phần tử trên đỉnh của stack','Địa chỉ của chỉ thị kế tiếp','Địa chỉ của chỉ thị hiện hành','Địa chỉ của phần tử ở đáy của stack'],a:0},
+{t:'asm',q:'Ba phần trong một chương trình assembly là',opts:['data section, bss section và text section','data section, stack section và text section','text section, heap section và data section','bss section, buffer section và text section'],a:0},
+{t:'asm',q:'Thanh ghi nào sau đây trong x86-64bit là tương đương với thanh ghi PC trong máy tính John Von Neumann?',opts:['RIP','ESI','EDI','RAX'],a:0},
+{t:'asm',q:'Kết quả phép nhân 2 số 16 bit chứa trong',opts:['AX','DX','AX và DX','AX và BX'],a:2},
+{t:'asm',q:'Kết quả phép chia 2 số 8 bit chứa trong',opts:['AX','DX','AH và AL','DH và DL'],a:2},
+{t:'asm',q:'Lệnh assembly: MOV DX, [BP] sử dụng chế độ địa chỉ',opts:['Gián tiếp','Thanh ghi','Trực tiếp','Gián tiếp qua thanh ghi'],a:3},
+{t:'asm',q:'Lệnh Assembly: MOV DL, [01AF] sử dụng chế độ địa chỉ',opts:['Không tồn tại lệnh','Chế độ địa chỉ gián tiếp','Chế độ địa chỉ tức thì','Chế độ địa chỉ trực tiếp'],a:3},
+{t:'asm',q:'Lệnh nhảy nếu kết quả phép so sánh 2 số không dấu là lớn hơn',opts:['JG','JL','JA','JB'],a:2},
+{t:'asm',q:'Lệnh nhảy nếu kết quả phép so sánh 2 số không dấu là nhỏ hơn',opts:['JG','JL','JA','JB'],a:3},
+{t:'asm',q:'Lệnh nhảy nếu kết quả phép so sánh 2 số có dấu là lớn hơn hoặc bằng',opts:['JGE','JLE','JAE','JBE'],a:0},
+{t:'asm',q:'Lệnh nhảy nếu kết quả phép so sánh 2 số có dấu là nhỏ hơn hoặc bằng',opts:['JGE','JLE','JAE','JBE'],a:1},
+{t:'asm',q:'Những biến nào mang tính chất bền vững trong ngôn ngữ cấp cao?',opts:['Biến toàn cục và biến địa phương','Những biến được quản lý trong bộ nhớ','Biến địa phương','Biến toàn cục'],a:3},
+{t:'asm',q:'Một lệnh tối thiểu của hợp ngữ bao gồm',opts:['Nhãn + Lệnh + Các toán hạng + Lời chú giải','Lệnh + Lời chú giải','Lệnh + Các toán hạng','Nhãn + Lệnh + Các toán hạng'],a:2},
+{t:'asm',q:'Kết quả của quá trình biên dịch sẽ tạo ra file thực hiện, file này được lưu trữ ở đâu?',opts:['Main memory','Cache','RAM','HDD (Hard disk drive)'],a:3},
+{t:'asm',q:'Đâu là chỉ thị được dùng để thực hiện phép tính logic?',opts:['AND','ADD','MOV','CMP'],a:0},
+{t:'asm',q:'Đâu là lệnh rẽ nhánh có điều kiện trong ngôn ngữ assembly?',opts:['JZ','JMP','MOV','ADD'],a:0},
+{t:'asm',q:"Đâu là ví dụ một dòng chú thích trong chương trình assembly?",opts:['; Move the value 10 into the AX register','MOV AX, 10','ADD AX, BX','MOV BX, [SI]'],a:0},
+{t:'asm',q:'Đâu là chỉ thị được dùng để so sánh hai giá trị trong ngôn ngữ assembly?',opts:['CMP','ADD','MOV','JZ'],a:0},
+{t:'asm',q:'Đâu là ví dụ một directive trong ngôn ngữ assembly?',opts:['DB','MOV','AND','CALL'],a:0},
+{t:'asm',q:'Từ nào sau đây là một ví dụ về mnemonic trong ngôn ngữ assembly?',opts:['MOV','Memory','Integer','Input'],a:0},
+{t:'asm',q:'Ký hiệu nào sau đây không phải là thanh ghi trong ngôn ngữ assembly?',opts:['EX','BX','CX','AX'],a:0},
+{t:'asm',q:'Đâu là chỉ thị được dùng để thực hiện phép tính số học?',opts:['ADD','MOV','JMP','CMP'],a:0},
+{t:'asm',q:'Đâu là một ví dụ về nhãn trong ngôn ngữ assembly?',opts:['START','LOOP','MOV','XOR'],a:0},
+{t:'asm',q:'Chỉ thị nào sau đây được dùng để gọi một chương trình con (subroutine)?',opts:['CALL','ADD','MOV','RET'],a:0},
+{t:'asm',q:'Khai báo các biến và hằng trong trường nào?',opts:['Model','Stack','Data','Code'],a:2},
+{t:'asm',q:'Thứ tự các thành phần trong dòng lệnh trong chương trình hợp ngữ từ trái qua sẽ là',opts:['Nhãn, chú thích, lệnh, các toán hạng','Nhãn, lệnh, các toán hạng, chú thích','Nhãn, lệnh, chú thích, các toán hạng','Nhãn, các toán hạng, lệnh, chú thích'],a:1},
+{t:'asm',q:'Đâu không phải là một loại addressing mode trong ngôn ngữ assembly?',opts:['Parallel','Indirect','Immediate','Direct'],a:0},
+{t:'asm',q:'Các ký hiệu MOV hay ADD được gọi là',opts:['OP-Code','Operators','Commands','Operands'],a:0},
+{t:'asm',q:'Lệnh khai báo một biến 1 byte có tên "var" là',opts:['var DB 1,2,3','var DW ?','var DD ?','var DB ?'],a:3},
+{t:'asm',q:"Lệnh khai báo một xâu hoàn chỉnh (có đầu xâu, kết thúc xâu) có tên S là",opts:["S DB 13,10,65,66,67,68,'$'",'S db 100 dup(?)','S db \'a\'','S db "hello"'],a:0},
+{t:'asm',q:'Đâu là lệnh khai báo một hằng số?',opts:['Z db 33h,13h','T db 10 dup(50 dup(?))','Y db 3','X equ 2'],a:3},
+{t:'asm',q:'Lệnh khai báo một mảng có 100 phần tử, tên S là',opts:["S db 'a'",'S db "hello"','S db 100 dup(?)','S DB 100,13,10,65,66,67,68,\'$\',100'],a:2},
+{t:'asm',q:'Ký tự nhập vào từ bàn phím có mã ASCII nằm trong thanh ghi nào?',opts:['AL','BL','CL','DL'],a:0},
+{t:'asm',q:'Một ký tự muốn in ra màn hình phải có mã ASCII nằm trong thanh ghi nào?',opts:['AL','BL','CL','DL'],a:3},
+{t:'asm',q:'Đoạn chương trình dưới đây thực hiện nhiệm vụ gì? LEA DX, BUFFER / MOV AH, 09H / INT 21H',opts:['In ký tự đầu tiên được trỏ bởi buffer ra màn','Đọc một xâu ký tự từ bàn phím vào buffer','Đọc một ký tự vào buffer từ bàn phím','In xâu ký tự được trỏ bởi buffer ra màn hình'],a:3},
+{t:'asm',q:'Sau đoạn chương trình: MOV CX,7 / MOV AX,0 / TONG: ADD AX,CX / LOOP TONG ta có',opts:['AX=7','AX=28','AX=21','AX=25'],a:1},
+{t:'asm',q:'Sau khi thực hiện đoạn chương trình: MOV AL, 5 / MOV BL, 10 / ADD BL, AL / SUB BL, 1 - Giá trị trong thanh ghi BL bằng bao nhiêu?',opts:['5h','26h','0Eh','0'],a:2},
+{t:'asm',q:'Giả sử AX=2, BX=3, CF=1, sau lệnh ADC AX,BX sẽ có',opts:['AX=6, BX=3','AX=6, BX=0','AX=5, BX=3','AX=5, BX=0'],a:0},
+{t:'asm',q:'Giả sử AH=02, AL=03, sau lệnh MUL AH thì giá trị AL, AH bằng bao nhiêu?',opts:['AL=6, AH=02','AL=6, AH=03','AL=6, AH=0','AL=6, AH=6'],a:2},
+{t:'asm',q:'Giả sử AX=35F7H, BX=126EH, sau lệnh CMP AX,BX lệnh nào chuyển điều khiển đến nhãn N?',opts:['JG N','JL N','JE N','JB N'],a:3},
+{t:'asm',q:'Giả sử AX=35F7H, BX=126EH, sau lệnh CMP AH,BL lệnh nào chuyển điều khiển đến nhãn N?',opts:['JA N','JG N','JL N','JE N'],a:0},
+{t:'asm',q:'Giả sử có AX=1000, BX=2000, CX=3000, sau khi thực hiện: PUSH AX / PUSH BX / PUSH CX / POP AX / POP BX / POP CX',opts:['AX=1000,BX=2000,CX=3000','AX=3000,BX=1000,CX=2000','AX=3000,BX=2000,CX=1000','AX=2000,BX=1000,CX=3000'],a:2},
+{t:'asm',q:'Giả sử AL=35H, CL=4, sau lệnh SHR AL,CL ta được',opts:['AL=5,CL=0','AL=5,CL=4','AL=3,CL=4','AL=3,CL=0'],a:2},
+{t:'asm',q:'Sau khi thực hiện đoạn lệnh: XOR AX, AX / XOR BX, BX / MOV AX, 5857H / MOV BX, 58A8H / XOR AX, BX - Thanh ghi AL có giá trị bằng bao nhiêu?',opts:['58h','57h','A8h','FFh'],a:3},
+{t:'asm',q:'Kết quả của chỉ thị MOV AL, 65 là',opts:['Lưu 0100 0001 trong AL','Lưu 42H trong AL','Lưu 40H trong AL','Lưu 0100 0010 trong AL'],a:0},
+{t:'asm',q:'Nhóm chỉ thị nào sau đây không tác động (ảnh hưởng) đến các cờ (flags)?',opts:['Nhóm chỉ thị chuyển data','Nhóm chỉ thị tính toán logic','Nhóm chỉ thị tính toán số học','Nhóm chỉ thị rẽ nhánh (branch operation)'],a:0},
+{t:'asm',q:'Đoạn chương trình sau đây thực hiện nhiệm vụ gì? MOV CX,8 / XOR BX,BX / LAP: SHL AL,1 / JC TT / INC BX / TT: LOOP LAP',opts:['Đếm số bit 1 trong AL lưu vào BX','Đếm số bit 0 trong AL lưu vào BX','Đếm số bit 1 trong AL in ra màn hình','Đếm số bit 0 trong AL in ra màn hình'],a:1},
+{t:'asm',q:'Đoạn chương trình nhập 1 chữ số vào từ bàn phím là',opts:['MOV AH,01H / NHAP: INT 21H / CMP AL,30H / JL NHAP / CMP AL,39H / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,41H / JL NHAP / CMP AL,5AH / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,61H / JL NHAP / CMP AL,7AH / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,30H / JG NHAP / CMP AL,39H / JL NHAP'],a:0},
+{t:'asm',q:'Đoạn chương trình nhập 1 chữ cái in hoa vào từ bàn phím là',opts:['MOV AH,01H / NHAP: INT 21H / CMP AL,30H / JL NHAP / CMP AL,39H / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,41H / JL NHAP / CMP AL,5AH / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,61H / JL NHAP / CMP AL,7AH / JG NHAP','MOV AH,01H / NHAP: INT 21H / CMP AL,30H / JG NHAP / CMP AL,39H / JL NHAP'],a:1},
+{t:'asm',q:'Sau đoạn chương trình: MOV AX,0 / MOV CX,7 / TONG: ADD AX,CX / INC CX / CMP CX,10 / JLE TONG ta có',opts:['AX=28','AX=34','AX=55','AX=25'],a:1},
+{t:'asm',q:'Thanh ghi nào sau đây trong x86-64 bit?',opts:['RAX','EBX','EIP','EDX'],a:0},
+{t:'asm',q:'Giá trị AX, BX, CX, DX sau: MOV AX,100 / MOV BX,71 / ADD AX,BX / PUSH BX / PUSH AX / POP CX / ADD CX,2 / POP DX / AND DX,CX lần lượt là',opts:['00ABh, 0047h, 00ADh, 0005h','00ABh, 0047h, 00ADh, 0047h','00ABh, 0047h, 00ABh, 0005h','00ADh, 0047h, 00ADh, 0005h'],a:0},
+{t:'asm',q:'Giá trị AX, BX, CX, DX sau: MOV AX,300 / MOV BX,47 / MOV CX,41 / MOV DX,12 / SUB AX,CX / ADD BX,DX lần lượt là',opts:['0103h, 003Bh, 0029h, 000Ch','0103h, 0029h, 003Bh, 000Ch','003Bh, 0103h, 0029h, 000Ch','0103h, 000Ch, 0029h, 003Bh'],a:0},
+{t:'asm',q:'Giá trị AX, BX, CX, DX sau: MOV AX,71 / MOV BX,17 / AND AX,BX / MOV CX,AX / MOV DX,BX lần lượt là',opts:['0063h, 0011h, 0011h, 0063h','0036h, 0010h, 0010h, 0036h','0001h, 0011h, 0001h, 0011h','0036h, 0000h, 0011h, 0000h'],a:2},
+{t:'asm',q:'Thành phần bộ nhớ nào đóng vai trò toán hạng trong chỉ thị?',opts:['Thanh ghi','HDD','SSD','CD ROM'],a:0},
+{t:'asm',q:'LD chép các word vào thanh ghi và __',opts:['DS','ES','SS','CS'],a:0},
+{t:'asm',q:'Mục đích chính khi tạo ra ngôn ngữ assembly là',opts:['Để cung cấp một phương tiện tương tác với phần cứng ở mức thấp','Để làm cho lập trình khó hơn','Để đơn giản việc lập trình bằng cách cung cấp cấu trúc ngôn ngữ mức cao','Để cung cấp một phương tiện tương tác với phần cứng ở mức cao'],a:0},
+{t:'asm',q:'Phát biểu nào sau đây là đúng với các chương trình viết bằng ngôn ngữ assembly?',opts:['Chạy nhanh hơn và hiệu quả hơn các chương trình ngôn ngữ mức cao','Độc lập với máy (machine-independent)','Dễ đọc hơn các chương trình ngôn ngữ mức cao','Khó debug hơn chương trình ngôn ngữ mức cao'],a:0},
+{t:'asm',q:'Các chương trình ngôn ngữ assembly được viết dùng',opts:['Mnemonics','Hex code','ASCII code','Binary code'],a:0},
+{t:'asm',q:'Đâu là mặt hạn chế khi dùng ngôn ngữ assembly?',opts:['Không chạy trên các kiến trúc phần cứng khác','Chạy chậm và hiệu quả thấp hơn ngôn ngữ mức cao','Không cho truy xuất trực tiếp đến tài nguyên phần cứng','Dễ viết và lưu giữ'],a:0},
+{t:'asm',q:'Đâu là phát biểu đúng về lợi ích khi dùng ngôn ngữ assembly?',opts:['Cung cấp khả năng điều khiển trực tiếp các tài nguyên phần cứng','Dễ viết và dễ lưu giữ hơn ngôn ngữ mức cao','Dễ chuyển sang các kiến trúc phần cứng khác','Dễ đọc và chạy nhanh hơn ngôn ngữ mức cao'],a:0},
+{t:'asm',q:'Đâu không phải là một kiểu dữ liệu trong ngôn ngữ assembly?',opts:['Boolean','String','Float','Integer'],a:0},
+{t:'asm',q:'Cho đoạn khai báo dữ liệu: .DATA / mem1 dw 500,-20,-100 / mem2 dd -50,70 / msg db "Kien truc may tinh!" / vec db 10,20,-10,-20,-30,-40 / Dữ liệu này chiếm dung lượng trong bộ nhớ là',opts:['38 bytes','41 bytes','40 bytes','42 bytes'],a:2},
+{t:'asm',q:'Để xoá thanh ghi CX về 0, lệnh nào sau đây là đúng?',opts:['OR CX,0','CMP CX,0','MOV CX,[0]','XOR CX,CX'],a:3},
+{t:'asm',q:'Sau khi thực hiện: MOV AL, 200 / MOV BL, 4 / MUL BL - Thanh ghi AL có kết quả bằng bao nhiêu?',opts:['3h','80h','4h','20h'],a:3},
+{t:'asm',q:'Cho trích đoạn chương trình assembly trên Linux: MOV EAX,3 / MOV EBX,0 / MOV ECX,INPUT_BUFFER / MOV EDX,256 / INT 0X80 - Phát biểu nào sau đây là đúng?',opts:['Đoạn chương trình để đọc dữ liệu nhập từ bàn phím vào máy tính','Đoạn chương trình để in thông báo lên màn hình máy tính','Đoạn chương trình để đọc dữ liệu nhập từ bộ đệm vào máy tính','Đoạn chương trình để ghi dữ liệu ra ổ đĩa cứng thứ cấp của máy tính'],a:0},
+{t:'asm',q:'Sau khi thực hiện đoạn chương trình: ORG 100H / MOV AX,0 / MOV BX,0 / MOV AL,5 / MOV BL,10H / ADD AL,BL / XOR BL,55H - Thanh ghi AX có giá trị bằng bao nhiêu?',opts:['35h','25h','15h','45h'],a:2},
+{t:'asm',q:'Xét đoạn chương trình: MOV CX,0 / MOV AH,1 / DOC: INT 21h / CMP AL,0 / JE thoat / INC CX / JMP DOC / Thoat: - Bộ đếm CX có giá trị là',opts:['CX có giá trị bằng số ký tự được đọc vào','CX chứa giá trị được hiển thị','CX = 0','CX = 1'],a:0},
+{t:'asm',q:'Phát biểu sau đây là phù hợp với chế độ địa chỉ nào: "Thanh ghi chứa địa chỉ hiệu quả (effective address)"?',opts:['Gián tiếp thanh ghi','Trực tiếp thanh ghi','Thanh ghi chỉ số','Độ dời'],a:0},
+{t:'asm',q:'Phát biểu sau đây là đúng cho chế độ địa chỉ nào: "Địa chỉ hiệu quả (effective address) là nội dung của địa chỉ được chỉ ra trong chỉ thị"?',opts:['Gián tiếp','Trực tiếp','Thanh ghi nền','Tức thời'],a:0},
+// ==================== BUS & I/O ====================
+{t:'bus',q:'Bus hệ thống của máy tính bao gồm',opts:['Bus dữ liệu, bus ngoại vi, bus bên trong CPU','Bus dữ liệu, Bus địa chỉ','Bus dữ liệu và Bus điều khiển','Bus dữ liệu, Bus địa chỉ và Bus điều khiển'],a:3},
+{t:'bus',q:'Chức năng của hệ thống Bus trong máy tính là gì?',opts:['Mở rộng chức năng giao tiếp của máy tính','Liên kết các thành phần trong máy tính','Điều khiển các thiết bị ngoại vi','Biến đổi dạng tín hiệu trong máy tính'],a:1},
+{t:'bus',q:'Bus nào trong máy tính có nhiệm vụ là đường truyền dẫn giữa các khối của bộ vi xử lý?',opts:['Bus trong bộ vi xử lý','Bus bộ vi xử lý','Bus ngoại vi','Bus hệ thống'],a:0},
+{t:'bus',q:'Bus nào trong máy tính có nhiệm vụ kết nối bộ vi xử lý với bộ nhớ chính và bộ nhớ Cache?',opts:['Bus trong bộ vi xử lý','Bus bộ vi xử lý','Bus ngoại vi','Bus hệ thống'],a:3},
+{t:'bus',q:'Bus nào trong máy tính có nhiệm vụ kết nối các thiết bị vào ra với bộ vi xử lý?',opts:['Bus trong bộ vi xử lý','Bus bộ vi xử lý','Bus ngoại vi','Bus hệ thống'],a:2},
+{t:'bus',q:'Việc trao đổi dữ liệu giữa thiết bị ngoại vi và máy tính được thực hiện qua',opts:['Thanh ghi cờ','Một thanh ghi điều khiển','Một cổng có địa chỉ xác định','Thanh ghi AX'],a:2},
+{t:'bus',q:'Các thành phần cơ bản của thiết bị ngoại vi là',opts:['Bộ chuyển đổi tín hiệu, Logic điều khiển, Bộ đệm','Bộ chuyển đổi trạng thái, Logic đọc, Bộ đếm tiến','Bộ chuyển đổi hiện thời, Logic ghi, Bộ kiểm tra','Bộ chuyển đổi địa chỉ, Logic nhận, Bộ đếm lùi'],a:0},
+{t:'bus',q:'Bus nào sau đây là một chiều?',opts:['Address bus','Control bus','Data bus','Tất cả các bus'],a:0},
+{t:'bus',q:'Có bao nhiêu phương pháp quản lý I/O?',opts:['3','2','4','5'],a:0},
+{t:'bus',q:'Đơn vị tính tốc độ truyền của bus là',opts:['Bit/giây (bps)','Hertz','Mili giây','Byte'],a:0},
+{t:'bus',q:'Bus thể hiện qua bao nhiêu đặc trưng?',opts:['5','4','6','3'],a:0},
+{t:'bus',q:'Một trong các đặc trưng của bus là',opts:['Ghép/không ghép','Tốc độ bus','Chiều dài bus','Phân cấp bus'],a:0},
+{t:'bus',q:'Hai hoạt động chính trên bus là',opts:['Đọc và ghi','Đọc và xóa','Ghi và xóa','Xóa và sửa'],a:0},
+{t:'bus',q:'Giải pháp cơ bản để cải thiện hiệu năng của hệ thống bus là',opts:['Phân cấp bus','Tăng bề rộng bus','Rút ngắn bus','Giảm số lượng bus'],a:0},
+{t:'bus',q:'Thiết bị ngoại vi được xếp vào mấy loại?',opts:['3','4','6','5'],a:0},
+{t:'bus',q:'Đặc điểm quan trọng của Bus đồng bộ là gì?',opts:['Dữ liệu được truyền không đồng thời','Có tín hiệu đồng hồ chung điều khiển hoạt động','Không có tín hiệu đồng hồ chung điều khiển hoạt động','Dữ liệu được truyền đồng thời'],a:1},
+{t:'bus',q:'Đặc điểm quan trọng của Bus không đồng bộ là gì?',opts:['Dữ liệu được truyền không đồng thời','Có tín hiệu đồng hồ chung điều khiển hoạt động','Không có tín hiệu đồng hồ chung điều khiển hoạt động','Dữ liệu được truyền đồng thời'],a:2},
+{t:'bus',q:'Chức năng của Bus hệ thống trong máy tính là gì?',opts:['Đường truyền dẫn giữa CPU và các chip hỗ trợ trung gian','Là đường truyền dẫn giữa các khối của bộ vi xử lý','Kết nối bộ vi xử lý với bộ nhớ chính, bộ nhớ Cache và các bộ điều khiển ghép nối vào ra','Kết nối hệ thống vào ra với bộ vi xử lý'],a:2},
+{t:'bus',q:'Chức năng của Bus ngoại vi trong máy tính là gì?',opts:['Đường truyền dẫn giữa CPU và các chip hỗ trợ trung gian','Là đường truyền dẫn giữa các khối của bộ vi xử lý','Kết nối bộ vi xử lý với bộ nhớ chính, bộ nhớ Cache và các bộ điều khiển ghép nối vào ra','Kết nối hệ thống vào ra với bộ vi xử lý'],a:3},
+{t:'bus',q:'Trong hệ thống máy tính có các phương pháp điều khiển vào/ra như sau',opts:['Vào/ra bằng chương trình, bằng ngắt, bằng DMA','Vào ra bằng ngắt, bằng hệ điều hành, bằng DMA','Vào/ra bằng chương trình, bằng hệ thống, bằng DMA','Vào/ra bằng ngắt, bằng truy nhập CPU, bằng DMA'],a:0},
+{t:'bus',q:'Bus địa chỉ 20 bit có thể địa chỉ hóa được số lượng ô nhớ là',opts:['2097152 ô nhớ','1048576 ô nhớ','4194304 ô nhớ','8388608 ô nhớ'],a:1},
+{t:'bus',q:'Bus địa chỉ 32 bit có thể địa chỉ hóa được số lượng ô nhớ là',opts:['16M ô nhớ','64M ô nhớ','1G ô nhớ','4G ô nhớ'],a:3},
+{t:'bus',q:'Trong trường hợp nào nên sử dụng Bus đồng bộ?',opts:['Khi hệ thống có nhiều thiết bị với tốc độ chênh lệch nhau rất lớn','Yêu cầu chu kỳ Bus có thể thay đổi với từng cặp thiết bị trao đổi dữ liệu','Mọi thao tác hầu hết có thời gian xử lý bằng bội số của chu kỳ Bus','Yêu cầu tận dụng tốt thời gian xử lý của CPU'],a:2},
+{t:'bus',q:'Trong trường hợp nào nên sử dụng Bus không đồng bộ?',opts:['Khi hệ thống có nhiều thiết bị với tốc độ chênh lệch nhau rất lớn','Yêu cầu chu kỳ Bus có thể thay đổi với từng cặp thiết bị trao đổi dữ liệu','Mọi thao tác hầu hết có thời gian xử lý bằng bội số của chu kỳ Bus','Yêu cầu tận dụng tốt thời gian xử lý của CPU'],a:0},
+{t:'bus',q:'Độ rộng của Bus được xác định bởi',opts:['Số đường dây dữ liệu của Bus','Số đường dây địa chỉ của Bus','Số thành phần được kết nối tới Bus','Số Byte dữ liệu được truyền trong một đơn vị thời gian'],a:0},
+{t:'bus',q:'Tần số Bus đặc trưng cho',opts:['Tốc độ điều khiển các thành phần của máy tính','Tốc độ truyền dữ liệu trên Bus','Tốc độ phân phối tài nguyên trong máy tính','Tốc độ cấp phát bộ nhớ cho các thành phần trong máy tính'],a:1},
+{t:'bus',q:'Không thể nối trực tiếp thiết bị ngoại vi với bus hệ thống vì',opts:['CPU không thể điều khiển được tất cả các thiết bị ngoại vi','Tốc độ trao đổi, khuôn dạng dữ liệu khác nhau','Tất cả có tốc độ chậm hơn CPU và RAM','Tất cả đều đúng'],a:3},
+{t:'bus',q:'Các đường dây IOR, IOW thuộc vào Bus nào?',opts:['Bus địa chỉ','Bus bộ vi xử lý','Bus dữ liệu','Bus điều khiển'],a:3},
+{t:'bus',q:'Các đường dây D0-D7 trong bộ vi xử lý Intel 8086/8088 thuộc vào Bus nào?',opts:['Bus địa chỉ','Bus bộ vi xử lý','Bus dữ liệu','Bus điều khiển'],a:2},
+{t:'bus',q:'Các đường dây A0-A19 trong bộ vi xử lý 8086/8088 thuộc vào Bus nào?',opts:['Bus địa chỉ','Bus bộ vi xử lý','Bus dữ liệu','Bus điều khiển'],a:0},
+{t:'bus',q:'Với phương pháp kiểm tra vòng bằng phần mềm, phát biểu nào sau đây là đúng?',opts:['CPU kiểm tra một lúc nhiều modul vào/ra','Tốc độ nhanh','CPU thực hiện kiểm tra từng modul vào/ra','CPU thực hiện phần mềm kiểm tra từng modul vào/ra'],a:3},
+{t:'bus',q:'Với phương pháp vào/ra bằng DMA, phát biểu nào sau đây là đúng?',opts:['Là phương pháp do CPU điều khiển trao đổi dữ liệu','Là phương pháp không do CPU điều khiển trao đổi dữ liệu','Là phương pháp được thực hiện bằng phần mềm','Là phương pháp trao đổi dữ liệu giữa thiết bị ngoại vi và CPU nhanh nhất'],a:1},
+{t:'bus',q:'Phát biểu nào sau đây là sai về hoạt động bus I/O?',opts:['Không có hoạt động bus trực tiếp giữa I/O và main memory','Có hoạt động bus trực tiếp giữa I/O và main memory','Có hoạt động bus trực tiếp giữa CPU và I/O','Có hoạt động bus trực tiếp giữa CPU và main memory'],a:0},
+{t:'bus',q:'Bước đầu tiên khi một module muốn làm việc với module khác qua bus là',opts:['Lấy quyền dùng bus','Khởi động bus','Đóng bus','Cấp phát bus'],a:0},
+{t:'bus',q:'Đặc trưng nào sau đây ảnh hưởng đến điều khiển bus?',opts:['Chia sẻ luân phiên','Chia sẻ đồng thời','Ghép kênh','Độ rộng'],a:0},
+{t:'bus',q:'Điều nào sau đây là đúng liên quan đến DMA?',opts:['CPU bị chiếm bus','I/O được ủy nhiệm truyền dữ liệu cho memory','Thực hiện kết nối I/O với Memory qua system bus','Chuẩn đĩa DMA RAID có tốc độ cao'],a:1},
+{t:'bus',q:'Phương thức nào sau đây thay mặt cho CPU điều khiển việc truyền dữ liệu?',opts:['Direct Memory Access (DMA)','Interrupt-driven I/O','Polled I/O','Software interrupts'],a:0},
+{t:'bus',q:'Khái niệm chiếm chu kỳ bus đề cập đến điều gì?',opts:['CPU dừng hoạt động và chờ','CPU chiếm chu kỳ bus của DMA module','CPU dừng hoạt động trên chương trình hiện hành và chuyển sang chương trình khác','Truy xuất bộ nhớ chính'],a:0},
+{t:'bus',q:'Memory-map I/O đề cập đến điều gì?',opts:['Địa chỉ của I/O module cùng dạng với địa chỉ bộ nhớ chính','Ánh xạ địa chỉ giữa I/O và bộ nhớ','Bản đồ địa chỉ I/O được lưu trong bộ nhớ','Bộ nhớ được đặt trên thành phần nhớ ngoài qua I/O'],a:0},
+{t:'bus',q:'Isolated I/O đề cập đến điều gì?',opts:['I/O module không chia sẻ không gian địa chỉ với bộ nhớ chính','Địa chỉ của I/O đồng dạng với địa chỉ trong bộ nhớ','I/O module chia sẻ không gian địa chỉ với bộ nhớ chính','Bộ nhớ được đặt trên thành phần nhớ ngoài qua I/O'],a:0},
+{t:'bus',q:'Mặt tích cực khi áp dụng cơ chế DMA là gì?',opts:['Giải phóng CPU khỏi các phiên truy xuất bộ nhớ kéo dài','Cho phép hoạt động truy xuất bộ nhớ song song','Cho phép nhiều chương trình chạy đồng thời trên máy tính','Giải phóng bộ nhớ chính khỏi các ràng buộc về kích thước lưu trữ'],a:0},
+{t:'bus',q:'Phát biểu nào sau đây là sai về I/O module?',opts:['I/O module là thiết bị ngoại vi của máy tính','I/O module không phải là thiết bị ngoại vi của máy tính','I/O module có hai mặt giao tiếp nội và ngoại','I/O module chính là thành phần Input/Output của máy tính'],a:0},
+{t:'bus',q:'Phát biểu nào sau đây là đúng về Programmed I/O?',opts:['Programmed I/O là phương thức điều khiển I/O module bằng cách cho CPU chạy một chương trình','Programmed I/O là phương thức điều khiển I/O module bằng cách sử dụng các module đã được lập trình','Programmed I/O được dùng để chỉ loại I/O module có khả năng thực thi các chương trình điều khiển','Programmed I/O là một tên gọi của một loại I/O module chuyên nạp các chương trình máy tính'],a:0},
+{t:'bus',q:'Phát biểu nào sau đây là đúng về mối quan hệ giữa ngắt và I/O?',opts:['Cơ chế ngắt (interrupt) cũng là một phương thức hỗ trợ quản lý I/O trong máy tính','Cơ chế ngắt (interrupt) không phải là một phương thức hỗ trợ quản lý I/O trong máy tính','Hoạt động I/O của máy tính không liên quan gì đến cơ chế ngắt (interrupt)','Hoạt động I/O của máy tính chỉ xuất hiện khi có cơ chế ngắt (interrupt)'],a:0},
+{t:'bus',q:'Cách thức thường dùng để ghép nối các thành phần trong máy tính có kiến trúc bus đa cấp là',opts:['Nối các thành phần có cùng tốc độ vào một cấp bus','Nối các thành phần có cùng chức năng vào một cấp bus','Nối các thành phần có kích thước xấp xỉ nhau vào cùng một cấp bus','Nối các thành phần có tầm quan trọng như nhau vào cùng một cấp bus'],a:0},
+{t:'bus',q:'Đâu là trở ngại khi dùng DMA?',opts:['CPU tranh chấp tài nguyên với DMA module','DMA module thường xuyên vi phạm thẩm quyền của CPU','CPU lấy chu kỳ bus của DMA module','Nghẽn trên memory bus'],a:0},
+{t:'bus',q:'Thời điểm nào cho phép treo CPU do DMA module trong chu kỳ chỉ thị?',opts:['Kết thúc giải mã lệnh','Kết thúc lấy lệnh','Kết thúc lấy toán hạng','Kết thúc lưu kết quả'],a:3},
+{t:'bus',q:'Cơ chế điều khiển đa truy nhập (multiaccess control) được áp dụng vào công việc gì?',opts:['Cấp quyền dùng bus','Điều khiển truy xuất bộ nhớ chính','Xử lý ngắt','Tăng hệ số đa chương'],a:0},
+{t:'bus',q:'Khi cả CPU và DMA module đều muốn dùng cùng một bus thì giải pháp phổ biến là',opts:['CPU phải nhường bus cho DMA module','DMA module phải nhường bus cho CPU','Chọn ngẫu nhiên','Treo bus tạm thời'],a:0},
+// ==================== BỘ NHỚ NGOÀI & RAID ====================
+{t:'storage',q:'Tốc độ chuẩn 1x của đĩa DVD tương ứng với',opts:['13 KB/s','130 KB/s','13 MB/s','1.3 MB/s'],a:3},
+{t:'storage',q:'Tốc độ chuẩn 1x của đĩa CDROM tương ứng với',opts:['15 MB/s','15 KB/s','1.5 MB/s','150 KB/s'],a:3},
+{t:'storage',q:'Đặc điểm của bộ nhớ ngoài so với bộ nhớ trong của máy tính là',opts:['Tốc độ truy cập bộ nhớ thường rất cao','Dung lượng nhỏ','Không mất dữ liệu khi mất nguồn','Giá thành cao'],a:2},
+{t:'storage',q:'Ưu điểm của bộ nhớ ngoài so với bộ nhớ trong của máy tính là',opts:['Tốc độ truy cập nhanh','Dung lượng lớn','Kích thước nhỏ gọn','Cấu tạo đơn giản'],a:1},
+{t:'storage',q:'Thời gian cần thiết để đọc một khối dữ liệu từ đĩa SSD vào bộ nhớ chính không bao gồm',opts:['Thời gian quay','Thời gian tìm kiếm','Thời gian khởi động','Thời gian truyền'],a:0},
+{t:'storage',q:'Loại bộ nhớ thứ cấp nào sau đây không cần dùng đầu từ?',opts:['SSD','HDD','FDD (đĩa mềm)','Băng từ'],a:0},
+{t:'storage',q:'NAND Flash là thành phần cơ bản của loại bộ nhớ thứ cấp nào?',opts:['SSD','HDD','CD-ROM','DVD'],a:0},
+{t:'storage',q:'NAS là viết tắt của',opts:['Network Attached Storage','Network Accessible Storage','Network Attached Server','Network Accessible Server'],a:0},
+{t:'storage',q:'SAN là viết tắt của',opts:['Storage Area Network','Server Accessible Network','Storage Attached Network','Server Area Network'],a:0},
+{t:'storage',q:'RAID là viết tắt của',opts:['Redundant Array of Independent Disk','Redundant Area of Independent Disk','Recycle Array of Independent Disk','Redundant Array of Integrative Drive'],a:0},
+{t:'storage',q:'Mỗi Sector trong đĩa cứng chứa dữ liệu với dung lượng tối thiểu bằng bao nhiêu?',opts:['256 Byte','1024 Byte','512 Byte','128 Byte'],a:2},
+{t:'storage',q:'Lượng thời gian cần thiết để đọc một khối dữ liệu từ đĩa cứng (HDD) vào bộ nhớ chính bao gồm __ phần cộng lại',opts:['3','4','5','2'],a:0},
+{t:'storage',q:'Quá trình đọc thông tin trên đĩa CDROM dựa trên hiện tượng gì?',opts:['Sự khác nhau về giá trị dòng quang điện khi ánh sáng phản xạ từ lớp lưu trữ dữ liệu','Sự phản chiếu của các tia laser năng lượng thấp từ lớp lưu trữ dữ liệu','Sự phản chiếu của các tia laser năng lượng cao từ lớp lưu trữ dữ liệu','Sự khác nhau về giá trị dòng quang điện khi ánh sáng phản xạ từ lớp bề mặt đĩa'],a:1},
+{t:'storage',q:'Nguyên lý của việc ghi dữ liệu trên đĩa cứng là gì?',opts:['Các bit 1 và 0 tương ứng với tốc độ di chuyển khác nhau của các điện tử trong vật liệu từ','Các bit 1 và 0 tương ứng với các trạng thái nhiễm từ khác nhau của vật liệu từ','Các bit 1 và 0 tương ứng với các momen lực từ khác nhau tác động lên đầu đọc','Các bit 1 và 0 tương ứng với các giá trị điện áp khác nhau trên vật liệu từ'],a:1},
+{t:'storage',q:'Phát biểu nào sau đây là sai về đĩa SSD?',opts:['Trên đĩa SSD vị trí của từ nhớ được định vị qua sector và track','Trên đĩa SSD cũng có chứa một bộ nhớ cache bên trong','Đĩa SSD cũng sử dụng chuẩn SATA như đĩa HDD','Đĩa SSD có kích thước nhỏ hơn HDD'],a:0},
+{t:'storage',q:'Đĩa cứng thuộc thành phần nào trong máy tính?',opts:['I/O của máy tính','Memory của máy tính','Bus của máy tính','DMA Module của máy tính'],a:0},
+{t:'storage',q:'Công đoạn nào sau đây tiêu tốn thời gian nhiều nhất khi chạy chương trình máy tính?',opts:['Truy xuất bộ nhớ ngoài','Tính toán của CPU','Biên dịch chương trình','Truy xuất bộ nhớ chính mà không có cache'],a:0},
+{t:'storage',q:'Khi cần bộ nhớ ngoài có dung lượng lớn, giá thành rẻ và cài hệ điều hành thì đâu là lựa chọn hợp lý?',opts:['HDD','SSD','Băng từ','CD-ROM'],a:0},
+{t:'storage',q:'Khi cần bộ nhớ ngoài chỉ để lưu trữ, dung lượng lớn giá thành rẻ thì đâu là lựa chọn hợp lý?',opts:['Băng từ','CD-ROM','HDD','SSD'],a:0},
+{t:'storage',q:'Khi cần bộ nhớ ngoài để cài hệ điều hành có dung lượng vừa phải thì đâu là lựa chọn hợp lý?',opts:['SSD','HDD','DVD','Băng từ'],a:0},
+{t:'storage',q:'Phát biểu nào sau đây là đúng về RAID0?',opts:['RAID0 không có đầy đủ tính năng của RAID','RAID0 có đầy đủ tính năng của RAID','RAID0 chính là RAID2 bỏ bớt các tính năng của RAID1','RAID0 chỉ có thể cài trên các server'],a:0},
+{t:'storage',q:'Cơ chế nào sau đây là giải pháp hỗ trợ xử lý song song và dự phòng?',opts:['RAID','DMA','Interrupt','Cache'],a:0},
+{t:'storage',q:'Lệnh format trong các hệ điều hành được dùng để làm gì?',opts:['Địa chỉ hóa các vị trí trên đĩa nhớ','Chỉnh hình dạng cho đĩa nhớ','Sửa chữa phần logic của đĩa nhớ','Sửa chữa phần vật lý của đĩa nhớ'],a:0},
+{t:'storage',q:'Phát biểu nào sau đây là sai về bộ nhớ trong?',opts:['Bộ nhớ trong bao gồm ổ đĩa cứng được gắn bên trong máy tính','Bộ nhớ trong không bao gồm đĩa cứng được gắn bên trong máy tính','Bộ nhớ trong bao gồm bộ nhớ cache','Bộ nhớ trong bao gồm các thanh ghi'],a:0},
+{t:'storage',q:'Phát biểu nào sau đây là đúng về ổ đĩa C?',opts:['Ổ đĩa C là một trong các thiết bị ngoại vi của máy tính','Ổ đĩa C là đĩa HDD','Ổ đĩa C là đĩa SSD','Ổ đĩa C chỉ để lưu trữ dữ liệu bên trong máy tính'],a:0},
+{t:'storage',q:'Cylinder là',opts:['Tập hợp các track đồng dạng trên nhiều mặt đĩa','Tập hợp các sector trên nhiều mặt đĩa','Tập hợp các track trên các đĩa khác nhau','Tập hợp các sector trên các đĩa khác nhau'],a:0},
+{t:'storage',q:'RAID có vai trò gì?',opts:['Dự phòng và tăng tốc độ truy xuất bộ nhớ ngoài','Sửa lỗi và tăng tốc độ thực thi chỉ thị cho CPU','Tăng tốc độ truy xuất bộ nhớ chính và dự phòng','Hỗ trợ truy xuất song song và dự phòng cho bộ nhớ cache'],a:0},
+{t:'storage',q:'RAID5 có cải tiến gì so với RAID4?',opts:['Giảm được tình trạng nghẽn khi ghi','Giảm được tình trạng nghẽn khi đọc','Dùng phương pháp dự phòng tiên tiến hơn','Tăng dung lượng dự phòng'],a:0},
+{t:'storage',q:'Trên các hệ thống RAID tình trạng xung đột truy xuất tài nguyên thường xảy ra trong trường hợp nào?',opts:['Cùng ghi','Cùng đọc','Đọc-ghi xen kẽ','Ghi-đọc xen kẽ'],a:0},
+{t:'storage',q:'Phát biểu nào sau đây là đúng về cơ chế truy xuất đĩa cứng (HDD)?',opts:['Cơ chế truy xuất trực tiếp được dùng trong đĩa cứng (HDD)','Cơ chế truy xuất tuần tự được dùng trong đĩa cứng (HDD)','Cơ chế truy xuất ngẫu nhiên được dùng trong đĩa cứng (HDD)','Cơ chế truy xuất liên kết được dùng trong đĩa cứng (HDD)'],a:0},
+{t:'storage',q:'Phát biểu nào sau đây là đúng về cơ chế truy xuất đĩa SSD?',opts:['Cơ chế truy xuất trong đĩa SSD là truy xuất ngẫu nhiên','Cơ chế truy xuất trong đĩa SSD là truy xuất liên kết','Cơ chế truy xuất trong đĩa SSD là truy xuất tuần tự','Cơ chế truy xuất trong đĩa SSD là truy xuất trực tiếp'],a:0},
+{t:'storage',q:'I/O channel được áp dụng để phát triển trong thành phần nào?',opts:['GPU cards','Disk controllers','UART','SATA'],a:1},
+];
+
+        // ======== STATE ========
+        let questions=[], current=0, answers=[], mode='exam', startTime=0;
+        let totalTimerInterval=null, totalTimeLeft=0, examMode='exam';
+
+        function shuffle(a){return[...a].sort(()=>Math.random()-.5)}
+
+        // ======== INIT ========
+        window.onload=function(){
+        const counts={};
+        ALL_QUESTIONS.forEach(q=>{counts[q.t]=(counts[q.t]||0)+1});
+        document.getElementById('hstatTotal').textContent=`📚 ${ALL_QUESTIONS.length} câu hỏi`;
+        document.getElementById('bankInfoText').textContent=
+        `${ALL_QUESTIONS.length} câu | ${Object.keys(counts).map(k=>TOPIC_ICONS[k]+' '+counts[k]).join(' | ')}`;
+        buildTopicCards(counts);
+        renderLeaderboard();
+
+        window.addEventListener('scroll',()=>{
+        document.getElementById('scrollTopBtn').classList.toggle('visible',window.scrollY>300);
+        });
+        // Load saved name
+        const n=localStorage.getItem('quizStudentName')||'';
+        if(n) document.getElementById('studentName').value=n;
+        };
+
+        function buildTopicCards(counts){
+        const wrap=document.getElementById('topicCards');
+        wrap.innerHTML='';
+        Object.keys(TOPIC_NAMES).forEach(k=>{
+        const d=document.createElement('div');
+        d.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s';
+        d.onmouseenter=()=>d.style.borderColor='var(--blue)';
+        d.onmouseleave=()=>d.style.borderColor='var(--border)';
+        d.innerHTML=`<div style="font-size:24px;margin-bottom:6px">${TOPIC_ICONS[k]}</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px">${TOPIC_NAMES[k]}</div>
+        <div style="font-size:11px;color:var(--text2)">${counts[k]||0} câu hỏi</div>`;
+        d.onclick=()=>{
+        document.getElementById('topicSel').value=k;
+        document.getElementById('numQ').value='20';
+        document.getElementById('totalTime').value='1200';
+        selectMode(document.querySelector('[data-mode="practice"]'));
+        switchSetupTab('exam');
+        startQuiz();
+        };
+        wrap.appendChild(d);
+        });
+        }
+
+        function switchSetupTab(tab){
+        ['exam','practice','leaderboard'].forEach(t=>{
+        document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).style.display=t===tab?'block':'none';
+        });
+        document.querySelectorAll('#setupTabs .tab').forEach((el,i)=>{
+        el.classList.toggle('active',['exam','practice','leaderboard'][i]===tab);
+        });
+        if(tab==='leaderboard') renderLeaderboard();
+        }
+
+        function selectMode(el){
+        document.querySelectorAll('.mode-card').forEach(c=>c.classList.remove('selected'));
+        el.classList.add('selected');
+        examMode=el.dataset.mode;
+        }
+
+        // ======== START ========
+        function startQuiz(){
+        const name=document.getElementById('studentName').value.trim();
+        if(examMode==='exam' && !name){
+        document.getElementById('studentName').focus();
+        document.getElementById('studentName').style.borderColor='var(--red)';
+        setTimeout(()=>document.getElementById('studentName').style.borderColor='',2000);
+        return;
+        }
+        localStorage.setItem('quizStudentName',name);
+
+        const n=parseInt(document.getElementById('numQ').value);
+        const topic=document.getElementById('topicSel').value;
+        const order=document.getElementById('orderMode').value;
+        let pool=ALL_QUESTIONS.filter(q=>topic==='all'||q.t===topic);
+        if(order==='random') pool=shuffle(pool);
+        questions=n===0?pool:pool.slice(0,Math.min(n,pool.length));
+        current=0; answers=new Array(questions.length).fill(null);
+        mode=examMode;
+        startTime=Date.now();
+
+        // Shuffle answer options per question
+        questions.forEach(q=>{
+        const shuffled=q.opts.map((o,i)=>({text:o,orig:i}));
+        if(order==='random') shuffled.sort(()=>Math.random()-.5);
+        q._sh=shuffled;
+        });
+
+        document.getElementById('setupScreen').style.display='none';
+        document.getElementById('quizScreen').style.display='block';
+        document.getElementById('btnSubmitEarly').style.display= mode==='exam'?'flex':'none';
+
+        // Total timer
+        const tt=parseInt(document.getElementById('totalTime').value);
+        const ttBlock=document.getElementById('totalTimerBlock');
+        if(tt>0 && mode!=='review'){
+        ttBlock.style.display='flex';
+        totalTimeLeft=tt;
+        updateTotalTimer();
+        totalTimerInterval=setInterval(()=>{
+        totalTimeLeft--;
+        updateTotalTimer();
+        if(totalTimeLeft<=0){clearInterval(totalTimerInterval);timeUp();}
+        },1000);
+        } else {
+        ttBlock.style.display='none';
+        }
+
+        buildNavGrid();
+        renderQ();
+        }
+
+        function updateTotalTimer(){
+        const m=Math.floor(totalTimeLeft/60), s=totalTimeLeft%60;
+        const el=document.getElementById('totalTimerVal');
+        const block=document.getElementById('totalTimerBlock');
+        el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        block.className='total-timer';
+        if(totalTimeLeft<=60) block.classList.add('danger');
+        else if(totalTimeLeft<=180) block.classList.add('warn');
+        }
+
+        function timeUp(){
+        document.getElementById('timeupModal').classList.add('show');
+        }
+
+        function buildNavGrid(){
+        const grid=document.getElementById('qNavGrid');
+        grid.innerHTML='';
+        questions.forEach((_,i)=>{
+        const b=document.createElement('button');
+        b.className='qn-btn'+(i===current?' current':'');
+        b.textContent=i+1;
+        b.onclick=()=>jumpToQ(i);
+        grid.appendChild(b);
+        });
+        }
+
+        function updateNavGrid(){
+        const btns=document.querySelectorAll('.qn-btn');
+        btns.forEach((b,i)=>{
+        b.className='qn-btn';
+        if(i===current) b.classList.add('current');
+        else if(answers[i]){
+        if(answers[i].skipped) b.classList.add('skipped');
+        else if(mode==='practice'||mode==='review'){
+        b.classList.add(answers[i].correct?'answered-correct':'answered-wrong');
+        } else b.classList.add('answered-correct'); // in exam mode just show answered
+        }
+        });
+        }
+
+        function jumpToQ(idx){
+        if(idx===current) return;
+        // Save current state if in exam mode (unanswered = skip marker)
+        current=idx;
+        renderQ();
+        }
+
+        function renderQ(){
+        const q=questions[current];
+        const pct=((current+1)/questions.length)*100;
+        document.getElementById('progressFill').style.width=pct+'%';
+        document.getElementById('qCurrent').textContent=current+1;
+        document.getElementById('qTotal').textContent=questions.length;
+
+        // Answered stats
+        const ac=answers.filter(a=>a&&!a.skipped).length;
+        const sc=answers.filter(a=>a&&a.skipped).length;
+        document.getElementById('answeredCount').textContent=ac;
+        document.getElementById('skippedCount').textContent=sc;
+
+        document.getElementById('qBadge').textContent=`Câu ${current+1} — ${TOPIC_NAMES[q.t]}`;
+        document.getElementById('qText').textContent=q.q;
+        document.getElementById('feedbackBar').className='feedback-bar';
+        document.getElementById('btnNext').style.display='none';
+        document.getElementById('btnSkip').style.display= answers[current]?'none':'flex';
+
+        const wrap=document.getElementById('optionsWrap');
+        wrap.innerHTML='';
+        q._sh.forEach((opt,i)=>{
+        const div=document.createElement('div');
+        div.className='opt';
+        div.onclick=()=>selectOpt(div,i);
+        div.innerHTML=`<div class="opt-letter">${LETTERS[i]}</div><div class="opt-text">${opt.text}</div>`;
+        wrap.appendChild(div);
+        });
+
+        // If already answered, restore state
+        if(answers[current]){
+        restoreAnswerUI();
+        }
+
+        updateNavGrid();
+        window.scrollTo({top:0,behavior:'smooth'});
+        }
+
+        function restoreAnswerUI(){
+        const ans=answers[current];
+        const q=questions[current];
+        const opts=document.querySelectorAll('.opt');
+        const correctShIdx=q._sh.findIndex(s=>s.orig===q.a);
+
+        if(ans.skipped){
+        opts.forEach(o=>{o.onclick=null;o.classList.add('skipped')});
+        const fb=document.getElementById('feedbackBar');
+        fb.textContent='⚡ Đã bỏ qua câu này.';
+        fb.className='feedback-bar show skip';
+        } else {
+        opts.forEach(o=>o.onclick=null);
+        if(mode==='practice'||mode==='review'){
+        opts[ans.chosen].classList.add(ans.correct?'correct':'wrong');
+        if(!ans.correct) opts[correctShIdx].classList.add('show-correct');
+        showFeedbackUI(ans.correct, correctShIdx);
+        } else {
+        // exam mode: just show selected
+        opts[ans.chosen].classList.add('selected');
+        }
+        }
+        document.getElementById('btnSkip').style.display='none';
+        document.getElementById('btnNext').style.display='flex';
+        }
+
+        function selectOpt(div,idx){
+        const q=questions[current];
+        const correctShIdx=q._sh.findIndex(s=>s.orig===q.a);
+        const isCorrect=idx===correctShIdx;
+
+        document.querySelectorAll('.opt').forEach(o=>o.onclick=null);
+        answers[current]={chosen:idx,correct:isCorrect,skipped:false};
+
+        if(mode==='practice'||mode==='review'){
+        div.classList.add(isCorrect?'correct':'wrong');
+        if(!isCorrect) document.querySelectorAll('.opt')[correctShIdx].classList.add('show-correct');
+        showFeedbackUI(isCorrect, correctShIdx);
+        } else {
+        div.classList.add('selected');
+        }
+        document.getElementById('btnSkip').style.display='none';
+        document.getElementById('btnNext').style.display='flex';
+        updateNavGrid();
+
+        // Auto-advance in practice mode after delay
+        if(mode==='practice'){
+        setTimeout(()=>{ if(current<questions.length-1) nextQ(); else showResult(); },1200);
+        }
+        }
+
+        function showFeedbackUI(isCorrect, correctShIdx){
+        const fb=document.getElementById('feedbackBar');
+        fb.textContent=isCorrect?'✅ Chính xác! Bạn trả lời đúng.':
+        `❌ Sai rồi! Đáp án đúng là ${LETTERS[correctShIdx]}.`;
+        fb.className='feedback-bar show '+(isCorrect?'ok':'no');
+        }
+
+        function skipQ(){
+        answers[current]={chosen:-1,correct:false,skipped:true};
+        updateNavGrid();
+        const fb=document.getElementById('feedbackBar');
+        fb.textContent='⚡ Đã bỏ qua. Bạn có thể quay lại sau.';
+        fb.className='feedback-bar show skip';
+        document.getElementById('btnSkip').style.display='none';
+        document.getElementById('btnNext').style.display='flex';
+        updateNavGrid();
+        // find next unanswered
+        setTimeout(()=>{
+        const next=findNextUnanswered();
+        if(next!==-1){current=next;renderQ();}
+        else{document.getElementById('btnNext').style.display='flex';}
+        },400);
+        }
+
+        function findNextUnanswered(){
+        for(let i=current+1;i<questions.length;i++) if(!answers[i]) return i;
+        for(let i=0;i<current;i++) if(!answers[i]) return i;
+        return -1;
+        }
+
+        function nextQ(){
+        if(current<questions.length-1){
+        // find next unanswered first
+        const next=findNextUnanswered();
+        current= next!==-1 ? next : current+1<questions.length ? current+1 : current;
+        if(current>=questions.length){showResult();return;}
+        renderQ();
+        } else {
+        const unanswered=answers.filter(a=>!a).length;
+        if(unanswered>0 && mode==='exam') confirmSubmit();
+        else showResult();
+        }
+        }
+
+        function confirmSubmit(){
+        const unanswered=answers.filter(a=>!a).length;
+        document.getElementById('unansweredLeft').textContent=unanswered;
+        document.getElementById('submitModal').classList.add('show');
+        }
+
+        function closeModal(){
+        document.getElementById('submitModal').classList.remove('show');
+        }
+
+        function doSubmit(){
+        document.getElementById('submitModal').classList.remove('show');
+        document.getElementById('timeupModal').classList.remove('show');
+        clearInterval(totalTimerInterval);
+        showResult();
+        }
+
+        // ======== RESULT ========
+        function showResult(){
+        clearInterval(totalTimerInterval);
+        document.getElementById('quizScreen').style.display='none';
+        document.getElementById('resultScreen').style.display='block';
+
+        const correct=answers.filter(a=>a&&!a.skipped&&a.correct).length;
+        const wrong=answers.filter(a=>a&&!a.skipped&&!a.correct).length;
+        const skipped=answers.filter(a=>!a||a.skipped).length;
+        const pct=Math.round(correct/questions.length*100);
+        const elapsed=Math.round((Date.now()-startTime)/1000);
+        const mm=Math.floor(elapsed/60),ss=elapsed%60;
+
+        const emoji=pct>=90?'🏆':pct>=70?'🎉':pct>=50?'👍':'😅';
+        const title=pct>=90?'Xuất sắc!':pct>=70?'Tốt lắm!':pct>=50?'Khá ổn!':'Cần cố gắng thêm!';
+        document.getElementById('resultEmoji').textContent=emoji;
+        document.getElementById('resultTitle').textContent=title;
+        document.getElementById('resultScoreBig').textContent=`${correct}/${questions.length}`;
+        document.getElementById('resultSub').textContent=`${pct}% — ${correct} đúng · ${wrong} sai · ${skipped} bỏ qua`;
+        document.getElementById('rCorrect').textContent=correct;
+        document.getElementById('rWrong').textContent=wrong;
+        document.getElementById('rSkipped').textContent=skipped;
+        document.getElementById('rTime').textContent=`${mm}:${String(ss).padStart(2,'0')}`;
+
+        let grade,gc,gb;
+        if(pct>=90){grade='A — Xuất sắc';gc='#3fb950';gb='rgba(63,185,80,.15)';}
+        else if(pct>=80){grade='B — Giỏi';gc='#2f81f7';gb='rgba(47,129,247,.15)';}
+        else if(pct>=65){grade='C — Khá';gc='#e3b341';gb='rgba(227,179,65,.15)';}
+        else if(pct>=50){grade='D — Trung bình';gc='#f0883e';gb='rgba(240,136,62,.15)';}
+        else{grade='F — Chưa đạt';gc='#f85149';gb='rgba(248,81,73,.15)';}
+        const gt=document.getElementById('gradeTag');
+        gt.textContent=grade;
+        gt.style.cssText=`color:${gc};background:${gb};border:1px solid ${gc}40`;
+
+        // Student info
+        const name=document.getElementById('studentName').value.trim();
+        const id=document.getElementById('studentId').value.trim();
+        document.getElementById('studentInfo').textContent=
+        [name,id].filter(Boolean).join(' · ')||(mode==='practice'?'Chế độ luyện tập':'');
+
+        // Topic breakdown
+        const tbWrap=document.getElementById('topicBreakdown');
+        const topicStats={};
+        questions.forEach((q,i)=>{
+        if(!topicStats[q.t]) topicStats[q.t]={c:0,t:0};
+        topicStats[q.t].t++;
+        if(answers[i]&&answers[i].correct) topicStats[q.t].c++;
+        });
+        let tbHtml='<div class="tb-title">📊 Thống kê theo chủ đề</div>';
+        Object.keys(topicStats).forEach(k=>{
+        const s=topicStats[k];
+        const p=Math.round(s.c/s.t*100);
+        const color=p>=70?'var(--green)':p>=50?'var(--yellow)':'var(--red)';
+        tbHtml+=`<div class="tb-row">
+        <div class="tb-label">${TOPIC_ICONS[k]} ${TOPIC_NAMES[k].split(' ')[0]}</div>
+        <div class="tb-bar-bg"><div class="tb-bar-fill" id="tb_${k}" style="width:0%;background:linear-gradient(90deg,${color},${color}aa)"></div></div>
+        <div class="tb-pct" style="color:${color}">${p}%</div>
+        </div>`;
+        });
+        tbWrap.innerHTML=tbHtml;
+        setTimeout(()=>{
+        Object.keys(topicStats).forEach(k=>{
+        const s=topicStats[k];
+        const el=document.getElementById('tb_'+k);
+        if(el) el.style.width=Math.round(s.c/s.t*100)+'%';
+        });
+        },100);
+
+        // Save to leaderboard
+        if(mode==='exam'&&document.getElementById('studentName').value.trim()){
+        saveToLeaderboard({
+        name:document.getElementById('studentName').value.trim(),
+        id:document.getElementById('studentId').value.trim(),
+        score:correct,
+        total:questions.length,
+        pct,
+        time:`${mm}:${String(ss).padStart(2,'0')}`,
+        elapsed,
+        ts:Date.now()
+        });
+        }
+        }
+
+        // ======== LEADERBOARD ========
+        function getLeaderboard(){
+        try{return JSON.parse(localStorage.getItem('quizLeaderboard')||'[]');}catch{return[];}
+        }
+        function saveToLeaderboard(entry){
+        const lb=getLeaderboard();
+        lb.push(entry);
+        lb.sort((a,b)=>b.pct-a.pct||a.elapsed-b.elapsed);
+        localStorage.setItem('quizLeaderboard',JSON.stringify(lb.slice(0,50)));
+        }
+        function clearLeaderboard(){
+        if(confirm('Xóa toàn bộ bảng xếp hạng?')){
+        localStorage.removeItem('quizLeaderboard');
+        renderLeaderboard();
+        }
+        }
+        function renderLeaderboard(){
+        const lb=getLeaderboard();
+        const wrap=document.getElementById('lbContent');
+        if(!wrap) return;
+        if(!lb.length){
+        wrap.innerHTML='<div class="lb-empty">🏆 Chưa có kết quả nào. Hãy thi và lên bảng xếp hạng!</div>';
+        return;
+        }
+        const me=document.getElementById('studentName')?.value.trim()||'';
+        let html='<div style="padding:12px 20px">';
+        html+=`<div style="display:grid;grid-template-columns:36px 1fr 80px 70px 70px;gap:8px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);margin-bottom:6px">
+        <div>#</div><div>Tên</div><div>Điểm</div><div>%</div><div>Thời gian</div>
+        </div>`;
+        lb.forEach((e,i)=>{
+        const isMe=me&&e.name===me;
+        const rankClass=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        const rankText=i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+        html+=`<div class="lb-row${isMe?' me':''}" style="display:grid;grid-template-columns:36px 1fr 80px 70px 70px;gap:8px;align-items:center">
+        <div class="lb-rank ${rankClass}">${rankText}</div>
+        <div>
+        <div style="font-weight:700;font-size:13px">${e.name}${isMe?'<span style="font-size:10px;color:var(--blue);margin-left:6px">(bạn)</span>':''}</div>
+        ${e.id?`<div style="font-size:11px;color:var(--text2)">${e.id}</div>`:''}
+        </div>
+        <div class="lb-score">${e.score}/${e.total}</div>
+        <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;color:${e.pct>=70?'var(--green)':e.pct>=50?'var(--yellow)':'var(--red)'}">${e.pct}%</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2)">${e.time}</div>
+        </div>`;
+        });
+        html+='</div>';
+        wrap.innerHTML=html;
+        }
+
+        // ======== REVIEW ========
+        let currentReviewFilter='all';
+        function filterReview(f){
+        currentReviewFilter=f;
+        ['all','wrong','correct','skipped'].forEach(x=>{
+        document.getElementById('rf'+x.charAt(0).toUpperCase()+x.slice(1)).className=
+        'btn btn-sm '+(f===x?'btn-primary':'btn-secondary');
+        });
+        renderReview();
+        }
+        function showReview(){
+        document.getElementById('resultScreen').style.display='none';
+        document.getElementById('reviewScreen').style.display='block';
+        currentReviewFilter='all';
+        filterReview('all');
+        }
+        function renderReview(){
+        const rc=document.getElementById('reviewContent');
+        rc.innerHTML='';
+        answers.forEach((ans,i)=>{
+        const q=questions[i];
+        const isSkip=!ans||ans.skipped;
+        const isOk=ans&&!ans.skipped&&ans.correct;
+        if(currentReviewFilter==='wrong'&&(isOk||isSkip)) return;
+        if(currentReviewFilter==='correct'&&!isOk) return;
+        if(currentReviewFilter==='skipped'&&!isSkip) return;
+
+        const card=document.createElement('div');
+        card.className='rev-card';
+        let statusClass=isSkip?'skip':isOk?'ok':'no';
+        let statusText=isSkip?'⚡ Bỏ qua':isOk?'✅ Đúng':'❌ Sai';
+        let html=`<span class="rev-status-tag ${statusClass}">${statusText}</span>
+        <div class="rev-num">Câu ${i+1} — ${TOPIC_ICONS[q.t]} ${TOPIC_NAMES[q.t]}</div>
+        <div class="rev-q-text">${q.q}</div>`;
+        const correctShIdx=q._sh.findIndex(s=>s.orig===q.a);
+        q._sh.forEach((opt,j)=>{
+        let cls='neutral',icon='';
+        if(j===correctShIdx){cls='correct-ans';icon='✓ ';}
+        if(ans&&!ans.skipped&&j===ans.chosen&&!isOk){cls='user-wrong';icon='✗ ';}
+        html+=`<div class="rev-opt ${cls}">${icon}${LETTERS[j]}. ${opt.text}</div>`;
+        });
+        card.innerHTML=html;
+        rc.appendChild(card);
+        });
+        if(!rc.children.length){
+        rc.innerHTML='<div style="text-align:center;padding:40px;color:var(--text2)">Không có câu nào trong bộ lọc này</div>';
+        }
+        }
+
+        function backToResult(){
+        document.getElementById('reviewScreen').style.display='none';
+        document.getElementById('resultScreen').style.display='block';
+        }
+        function retryQuiz(){
+        document.getElementById('resultScreen').style.display='none';
+        document.getElementById('setupScreen').style.display='block';
+        }
+        function backToSetup(){
+        document.getElementById('resultScreen').style.display='none';
+        document.getElementById('reviewScreen').style.display='none';
+        document.getElementById('quizScreen').style.display='none';
+        document.getElementById('setupScreen').style.display='block';
+        renderLeaderboard();
+        }
+    </script>
+</body>
+</html>
