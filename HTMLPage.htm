@@ -1447,7 +1447,10 @@
                 <div id="bankInfo" class="info-banner mt-12">
                     <span>📊</span><span id="bankInfoText">Đang tải...</span>
                 </div>
-
+                <div id="resumeBanner" style="display:none;background:rgba(47,129,247,0.1);border:1px solid var(--blue);border-radius:12px;padding:14px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px">
+                    <div style="font-size:13px;color:var(--blue)">📌 Bạn có bài thi đang dở — <span id="resumeInfo"></span></div>
+                    <button class="btn btn-primary btn-sm" onclick="resumeQuiz()">Tiếp tục →</button>
+                </div>
                 <button class="btn btn-primary btn-full btn-lg mt-8" onclick="startQuiz()">
                     🚀 Bắt đầu thi
                 </button>
@@ -2030,6 +2033,14 @@
         // Load saved name
         const n=localStorage.getItem('quizStudentName')||'';
         if(n) document.getElementById('studentName').value=n;
+        const saved=loadProgress();
+        const banner=document.getElementById('resumeBanner');
+        if(saved){
+        banner.style.display='flex';
+        const mins=Math.round((Date.now()-saved.savedAt)/60000);
+        document.getElementById('resumeInfo').textContent=
+        `${saved.questions.length} câu · ${saved.answers.filter(a=>a&&!a.skipped).length} đã làm · ${mins} phút trước`;
+        }
         };
 
         function buildTopicCards(counts){
@@ -2252,6 +2263,7 @@
         document.getElementById('btnSkip').style.display='none';
         document.getElementById('btnNext').style.display='flex';
         updateNavGrid();
+        saveProgress();
         }
 
         function showFeedbackUI(isCorrect, correctShIdx){
@@ -2276,6 +2288,7 @@
         if(next!==-1){current=next;renderQ();}
         else{document.getElementById('btnNext').style.display='flex';}
         },400);
+        saveProgress();
         }
 
         function findNextUnanswered(){
@@ -2309,6 +2322,7 @@
         }
 
         function doSubmit(){
+        clearProgress();
         document.getElementById('submitModal').classList.remove('show');
         document.getElementById('timeupModal').classList.remove('show');
         clearInterval(totalTimerInterval);
@@ -2495,6 +2509,61 @@
         }
         }
 
+         function saveProgress(){
+        const state={
+        questions:questions.map(q=>({...q,_sh:q._sh})),
+        answers,current,mode,startTime,examMode,
+        studentName:document.getElementById('studentName').value,
+        studentId:document.getElementById('studentId').value,
+        totalTimeLeft,
+        savedAt:Date.now()
+        };
+        localStorage.setItem('quizProgress',JSON.stringify(state));
+        }
+
+        function clearProgress(){
+        localStorage.removeItem('quizProgress');
+        }
+
+        function loadProgress(){
+        try{
+        const s=JSON.parse(localStorage.getItem('quizProgress'));
+        if(!s||!s.questions||!s.questions.length) return false;
+        const age=(Date.now()-s.savedAt)/1000/60/60;
+        if(age>24){clearProgress();return false;}
+        return s;
+        }catch{return false;}
+        }
+
+        function resumeQuiz(){
+        const s=loadProgress();
+        if(!s) return;
+        questions=s.questions;
+        answers=s.answers;
+        current=s.current;
+        mode=s.mode;
+        examMode=s.examMode;
+        startTime=s.startTime;
+        document.getElementById('studentName').value=s.studentName||'';
+        document.getElementById('studentId').value=s.studentId||'';
+        document.getElementById('setupScreen').style.display='none';
+        document.getElementById('quizScreen').style.display='block';
+        document.getElementById('btnSubmitEarly').style.display=mode==='exam'?'flex':'none';
+        const tt=s.totalTimeLeft||0;
+        if(tt>0&&mode!=='review'){
+        document.getElementById('totalTimerBlock').style.display='flex';
+        totalTimeLeft=tt;
+        updateTotalTimer();
+        totalTimerInterval=setInterval(()=>{
+        totalTimeLeft--;
+        updateTotalTimer();
+        if(totalTimeLeft<=0){clearInterval(totalTimerInterval);timeUp();}
+        },1000);
+        }else{
+        document.getElementById('totalTimerBlock').style.display='none';
+        }
+        buildNavGrid();renderQ();
+        }
         function backToResult(){
         document.getElementById('reviewScreen').style.display='none';
         document.getElementById('resultScreen').style.display='block';
@@ -2516,6 +2585,7 @@
     buildNavGrid(); renderQ();
 }
         function backToSetup(){
+        clearProgress();
         document.getElementById('resultScreen').style.display='none';
         document.getElementById('reviewScreen').style.display='none';
         document.getElementById('quizScreen').style.display='none';
